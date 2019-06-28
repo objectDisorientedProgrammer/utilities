@@ -19,6 +19,21 @@
 
 int main(void)
 {
-    printf("%s", CHR_getCharacter('0'));
+    char buf[100];
+
+    for (char i = '0'; i <= '9'; ++i)
+    {
+        printf("%s\n", CHR_getCharacter(i));
+    }
+
+    // for (int i = 0; i < 5; ++i)
+    // {
+    //     CHR_getPartialCharacter('2', i, buf + (i * 5), 100);
+    //     CHR_getPartialCharacter('5', i, buf + (i * 5), 100);
+    //     buf[i * 5 * 2] = '\n';
+    // }
+    
+    // printf("\n%s\n", buf);
+
     return 0;
 }
