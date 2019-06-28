@@ -21,7 +21,7 @@ extern "C" {
 #endif
 
 const char* CHR_getCharacter(const char c);
-char* CHR_getPartialCharacter(char c, int row);
+const char* CHR_getPartialCharacter(const char c, const int row, char* out, const int len);
 
 #ifdef __cplusplus
 }

@@ -31,27 +31,126 @@
                      CH_ZERO_2, '\n',\
                      CH_ZERO_3, '\n',\
                      CH_ZERO_4, '\n', '\0'
-
-// defines for one
-
-// defines for two
-
-// defines for three
-
-// defines for four
-
-// defines for five
-
-// defines for six
-
-// defines for seven
-
-// defines for eight
-
-// defines for nine
-
 const char zero[MIN_ARRAY_SIZE] =  { CH_FULL_ZERO };
 
+// defines for one
+#define CH_ONE_0    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_ONE_1    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_ONE_2    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_ONE_3    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_ONE_4    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_FULL_ONE CH_ONE_0, '\n',\
+                    CH_ONE_1, '\n',\
+                    CH_ONE_2, '\n',\
+                    CH_ONE_3, '\n',\
+                    CH_ONE_4, '\n', '\0'
+const char one[MIN_ARRAY_SIZE] =  { CH_FULL_ONE };
+
+// defines for two
+#define CH_TWO_0    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_TWO_1    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
+#define CH_TWO_2    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_TWO_3    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_TWO_4    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR
+#define CH_FULL_TWO CH_TWO_0, '\n',\
+                    CH_TWO_1, '\n',\
+                    CH_TWO_2, '\n',\
+                    CH_TWO_3, '\n',\
+                    CH_TWO_4, '\n', '\0'
+const char two[MIN_ARRAY_SIZE] =  { CH_FULL_TWO };
+
+// defines for three
+#define CH_THREE_0    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_THREE_1    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
+#define CH_THREE_2    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_THREE_3    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
+#define CH_THREE_4    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_FULL_THREE CH_THREE_0, '\n',\
+                      CH_THREE_1, '\n',\
+                      CH_THREE_2, '\n',\
+                      CH_THREE_3, '\n',\
+                      CH_THREE_4, '\n', '\0'
+const char three[MIN_ARRAY_SIZE] =  { CH_FULL_THREE };
+
+// defines for four
+#define CH_FOUR_0    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_FOUR_1    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_FOUR_2    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_FOUR_3    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR
+#define CH_FOUR_4    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_FULL_FOUR CH_FOUR_0, '\n',\
+                     CH_FOUR_1, '\n',\
+                     CH_FOUR_2, '\n',\
+                     CH_FOUR_3, '\n',\
+                     CH_FOUR_4, '\n', '\0'
+const char four[MIN_ARRAY_SIZE] =  { CH_FULL_FOUR };
+
+// defines for five
+#define CH_FIVE_0    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR
+#define CH_FIVE_1    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_FIVE_2    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_FIVE_3    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
+#define CH_FIVE_4    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_FULL_FIVE CH_FIVE_0, '\n',\
+                     CH_FIVE_1, '\n',\
+                     CH_FIVE_2, '\n',\
+                     CH_FIVE_3, '\n',\
+                     CH_FIVE_4, '\n', '\0'
+const char five[MIN_ARRAY_SIZE] =  { CH_FULL_FIVE };
+
+// defines for six
+#define CH_SIX_0    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR
+#define CH_SIX_1    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_SIX_2    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_SIX_3    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
+#define CH_SIX_4    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_FULL_SIX CH_SIX_0, '\n',\
+                     CH_SIX_1, '\n',\
+                     CH_SIX_2, '\n',\
+                     CH_SIX_3, '\n',\
+                     CH_SIX_4, '\n', '\0'
+const char six[MIN_ARRAY_SIZE] =  { CH_FULL_SIX };
+
+// defines for seven
+#define CH_SEVEN_0    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR
+#define CH_SEVEN_1    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
+#define CH_SEVEN_2    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_SEVEN_3    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_SEVEN_4    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_FULL_SEVEN CH_SEVEN_0, '\n',\
+                     CH_SEVEN_1, '\n',\
+                     CH_SEVEN_2, '\n',\
+                     CH_SEVEN_3, '\n',\
+                     CH_SEVEN_4, '\n', '\0'
+const char seven[MIN_ARRAY_SIZE] =  { CH_FULL_SEVEN };
+
+// defines for eight
+#define CH_EIGHT_0    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_EIGHT_1    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
+#define CH_EIGHT_2    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_EIGHT_3    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
+#define CH_EIGHT_4    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_FULL_EIGHT CH_EIGHT_0, '\n',\
+                     CH_EIGHT_1, '\n',\
+                     CH_EIGHT_2, '\n',\
+                     CH_EIGHT_3, '\n',\
+                     CH_EIGHT_4, '\n', '\0'
+const char eight[MIN_ARRAY_SIZE] =  { CH_FULL_EIGHT };
+
+// defines for nine
+#define CH_NINE_0    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_NINE_1    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
+#define CH_NINE_2    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR
+#define CH_NINE_3    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
+#define CH_NINE_4    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
+#define CH_FULL_NINE CH_NINE_0, '\n',\
+                     CH_NINE_1, '\n',\
+                     CH_NINE_2, '\n',\
+                     CH_NINE_3, '\n',\
+                     CH_NINE_4, '\n', '\0'
+const char nine[MIN_ARRAY_SIZE] =  { CH_FULL_NINE };
+
+static void decodeChar(const char c);
 static const char* numeric(const char c);
 static char* alphabetic(char c);
 
@@ -66,33 +165,50 @@ const char* CHR_getCharacter(const char c)
     return numeric(c);
 }
 
+const char* CHR_getPartialCharacter(const char c, const int row, char* out, const int len)
+{
+    int i;
+    const char* pStr = numeric(c);
+    char* begin;
+    char* end;
+
+    begin = (pStr + (row * CFG_CHAR_WIDTH));
+    end = begin + CFG_CHAR_WIDTH;
+    // while(*end != '\n' || *end != '\0')
+    //     ++end;
+    // *end = '\0';
+    for(i = 0; i < len && begin != end; ++i)
+    {
+        out[i] = *begin;
+        ++begin;
+    }
+   //*(out+CFG_CHAR_WIDTH) = '\0';
+
+    return pStr;
+}
+
+static void decodeChar(const char c)
+{
+
+}
+
 static const char* numeric(const char c)
 {
     const char* pStr;
     switch(c)
     {
-        case '0':
-            pStr = zero;
-            break;
-        case '1':
-            break;
-        case '2':
-            break;
-        case '3':
-            break;
-        case '4':
-            break;
-        case '5':
-            break;
-        case '6':
-            break;
-        case '7':
-            break;
-        case '8':
-            break;
-        case '9':
-            break;
+        case '0': pStr = zero; break;
+        case '1': pStr = one; break;
+        case '2': pStr = two; break;
+        case '3': pStr = three; break;
+        case '4': pStr = four; break;
+        case '5': pStr = five; break;
+        case '6': pStr = six; break;
+        case '7': pStr = seven; break;
+        case '8': pStr = eight; break;
+        case '9': pStr = nine; break;
         default:
+            //pStr = space;
             break;
     }
     return pStr;
