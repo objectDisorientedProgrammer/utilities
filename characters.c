@@ -170,7 +170,7 @@ const char* CHR_getPartialCharacter(const char c, const int row, char* out, cons
     int i;
     const char* pStr = numeric(c);
     const char* begin = &pStr[(row * CFG_CHAR_WIDTH)];
-    const char* end= &pStr[(row * CFG_CHAR_WIDTH) + CFG_CHAR_WIDTH + 1]; // TODO is +1 actually needed?
+    const char* end = &pStr[(row * (CFG_CHAR_WIDTH + CFG_NEWLINE_SIZE)) + (CFG_CHAR_WIDTH + CFG_NEWLINE_SIZE)];
 
     // copy the partial character into the output buffer
     for(i = 0; i < len && begin != end; ++i)
