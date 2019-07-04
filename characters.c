@@ -169,20 +169,15 @@ const char* CHR_getPartialCharacter(const char c, const int row, char* out, cons
 {
     int i;
     const char* pStr = numeric(c);
-    char* begin;
-    char* end;
+    const char* begin = &pStr[(row * CFG_CHAR_WIDTH)];
+    const char* end= &pStr[(row * CFG_CHAR_WIDTH) + CFG_CHAR_WIDTH + 1]; // TODO is +1 actually needed?
 
-    begin = (pStr + (row * CFG_CHAR_WIDTH));
-    end = begin + CFG_CHAR_WIDTH;
-    // while(*end != '\n' || *end != '\0')
-    //     ++end;
-    // *end = '\0';
+    // copy the partial character into the output buffer
     for(i = 0; i < len && begin != end; ++i)
     {
         out[i] = *begin;
         ++begin;
     }
-   //*(out+CFG_CHAR_WIDTH) = '\0';
 
     return pStr;
 }

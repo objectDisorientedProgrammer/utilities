@@ -25,15 +25,22 @@ int main(void)
     {
         printf("%s\n", CHR_getCharacter(i));
     }
-
-    // for (int i = 0; i < 5; ++i)
-    // {
-    //     CHR_getPartialCharacter('2', i, buf + (i * 5), 100);
-    //     CHR_getPartialCharacter('5', i, buf + (i * 5), 100);
-    //     buf[i * 5 * 2] = '\n';
-    // }
-    
-    // printf("\n%s\n", buf);
-
+#if 0
+// TODO combine 2 characters
+    for (int i = 0; i < 5; ++i)
+    {
+         CHR_getPartialCharacter('2', i, buf + (i * 5), 100);
+         CHR_getPartialCharacter('5', i, buf + (i * 5), 100);
+         buf[i * 5 * 2] = '\n';
+    }
+#endif
+#if 0
+// TODO read one character with getPartial() in another change
+    CHR_getPartialCharacter('2', 0, buf, 5);
+    printf("\n%s\n", buf);
+    CHR_getPartialCharacter('2', 1, buf+5, 10);
+    buf[11] = '\0';
+    printf("\n%s\n", buf);
+#endif
     return 0;
 }
