@@ -34,13 +34,21 @@ int main(void)
          buf[i * 5 * 2] = '\n';
     }
 #endif
-#if 0
+#if 2
 // TODO read one character with getPartial() in another change
-    CHR_getPartialCharacter('2', 0, buf, 5);
+    for(int k = 0; k < 5; ++k)
+    {
+        CHR_getPartialCharacter('2', k, buf+(k*6), 100);
+        buf[k*5+5] = ' ';
+        CHR_getPartialCharacter('1', k, buf+(k*6+6), 100);
+        buf[k*11+11] = '\0';
+    }
+    //for(int i = 0; i < 12; ++i)
+    //    printf("'%c'", buf[i]);
     printf("\n%s\n", buf);
-    CHR_getPartialCharacter('2', 1, buf+5, 10);
-    buf[11] = '\0';
-    printf("\n%s\n", buf);
+    //CHR_getPartialCharacter('2', 1, buf+6, 12);
+    //buf[11] = '\0';
+    //printf("\n%s\n", buf);
 #endif
     return 0;
 }
