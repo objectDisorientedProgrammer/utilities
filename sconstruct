@@ -2,6 +2,7 @@ programName = 'tester.app'
 
 srcs = Glob('*.c')
 
-env = Environment(CC = 'clang', CCFLAGS = '-std=gnu99 -O0 -ggdb')
+# can use CC = clang if installed
+env = Environment(CC = 'gcc', CCFLAGS = '-std=gnu99 -O0 -ggdb')
 
 env.Program(programName, srcs)
