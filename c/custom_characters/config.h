@@ -22,6 +22,7 @@ extern "C" {
 
 #define CFG_CHAR_HEIGHT 5 /// Height of the character (in characters)
 #define CFG_CHAR_WIDTH  5 /// Width of the character (in characters)
+#define CFG_NEWLINE_SIZE 1 // TODO check for Linux vs Windows
 
 #define CFG_FILLR_CHAR '#' /// Character which defines the boarder
 #define CFG_EMPTY_CHAR ' ' /// Character which defines the background (negative area)
