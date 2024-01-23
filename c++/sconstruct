@@ -1,0 +1,8 @@
+programName = 'fsinfo'
+
+srcs = Glob('*.cpp')
+
+# can use CC = clang if installed
+env = Environment(CC = 'g++', CCFLAGS = '-std=c++20 -ggdb')
+
+env.Program(programName, srcs)
