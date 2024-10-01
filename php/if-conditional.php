@@ -6,19 +6,19 @@
     <p>
       <?php
         $name="some name";
-		
-		if($name == "me")
-		{
-			echo "hi me";
-		}
-		elseif($name == "some name")
-		{
-			echo "Welcome";
-		}
-		else
-		{
-			echo "not me";
-		}
+    
+        if($name == "me")
+        {
+          echo "hi me";
+        }
+        elseif($name == "some name")
+        {
+          echo "Welcome";
+        }
+        else
+        {
+          echo "not me";
+        }
       ?>
     </p>
   </body>
