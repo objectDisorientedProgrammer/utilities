@@ -1,25 +1,33 @@
-#include "bit_operations.h"
+/*
+   Copyright 2025 objectDisorientedProgrammer
 
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+#include "bit_operations.h"
 #include <assert.h>
 #include <stdint.h>
-#include <stdio.h>
 
-void runTest_setbit(uint8_t* const val, const uint8_t bit, const uint8_t expected)
-{
-    //if (val != NULL)
-        uint8_t orig_val = *val; // assume val is not NULL...
-    if (bitop_u8_setbit(val, bit))
-    {
-        printf("Setting bit %d of value %d -> %d\n", bit, orig_val, *val);
-        assert(*val == expected);
-    }
-    else
-    {
-        printf("Failed to set bit %d\n", bit);
-    }
-}
+void run_u8_tests(void);
 
 int main(int argc, char const *argv[])
+{
+    run_u8_tests();
+
+    return 0;
+}
+
+void run_u8_tests(void)
 {
     uint8_t val = 0;
     uint8_t bit = 1;
@@ -92,6 +100,4 @@ int main(int argc, char const *argv[])
     // test NULL value for get bit
     assert(bitop_u8_getbit(NULL, bit) == 0xFF);
     assert(val == 4);
-
-    return 0;
 }
