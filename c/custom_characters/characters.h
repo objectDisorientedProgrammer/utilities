@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2019 Douglas Chidester
+    Copyright (c) 2019 objectDisorientedProgrammer
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ extern "C" {
 #endif
 
 const char* CHR_getCharacter(const char c);
-const char* CHR_getPartialCharacter(const char c, const int row, char* out, const int len);
+int CHR_getPartialCharacter(const char c, const int row, char* out, const int len, int offset);
 
 #ifdef __cplusplus
 }
