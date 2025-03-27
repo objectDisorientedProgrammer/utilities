@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2019 Douglas Chidester
+    Copyright (c) 2019 objectDisorientedProgrammer
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 #include "characters.h"
 #include "config.h"
+#include <ctype.h>
+#include <string.h>
 
 // minimum character array; height * width + height (for newlines) + 1 (null terminator)
 #define MIN_ARRAY_SIZE    CFG_CHAR_HEIGHT * CFG_CHAR_WIDTH + CFG_CHAR_HEIGHT + 1
@@ -60,11 +62,11 @@ const char one[MIN_ARRAY_SIZE] =  { CH_FULL_ONE };
 const char two[MIN_ARRAY_SIZE] =  { CH_FULL_TWO };
 
 // defines for three
-#define CH_THREE_0    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_THREE_1    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_THREE_2    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_THREE_3    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_THREE_4    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_THREE_0    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_THREE_1    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
+#define CH_THREE_2    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
+#define CH_THREE_3    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
+#define CH_THREE_4    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
 #define CH_FULL_THREE CH_THREE_0, '\n',\
                       CH_THREE_1, '\n',\
                       CH_THREE_2, '\n',\
@@ -150,41 +152,64 @@ const char eight[MIN_ARRAY_SIZE] =  { CH_FULL_EIGHT };
                      CH_NINE_4, '\n', '\0'
 const char nine[MIN_ARRAY_SIZE] =  { CH_FULL_NINE };
 
-static void decodeChar(const char c);
+// defines for space
+#define CH_SPACE_0   CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_SPACE_1   CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_SPACE_2   CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_SPACE_3   CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_SPACE_4   CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
+#define CH_FULL_SPACE   CH_SPACE_0, '\n', \
+                        CH_SPACE_1, '\n', \
+                        CH_SPACE_2, '\n', \
+                        CH_SPACE_3, '\n', \
+                        CH_SPACE_4, '\n', '\0'
+const char space[MIN_ARRAY_SIZE] = {CH_FULL_SPACE};
+
+static const char* decodeChar(const char c);
 static const char* numeric(const char c);
 static char* alphabetic(char c);
+static char* generate_space(void);
 
 const char* CHR_getCharacter(const char c)
 {
+    return decodeChar(c);
+}
+
+int CHR_getPartialCharacter(const char c, const int row, char* out, const int len, int offset)
+{
+    // make sure there's space to get the character
+    if (len < CFG_CHAR_WIDTH + 1)
+        return -1;
+
+    const char* pStr = decodeChar(c);
+    int newline = 1;
+
+    int maxCopy = len < CFG_CHAR_WIDTH + newline? len : CFG_CHAR_WIDTH;
+
+    // Adjust row calculation because full characters contain \n at th end of each row.
+    strncpy(out+offset, &pStr[row * (CFG_CHAR_WIDTH + newline)], maxCopy);
+    offset += CFG_CHAR_WIDTH;
+    out[offset] = CFG_EMPTY_CHAR;
+    offset += 1;
+
+    return offset;
+}
+
+static const char* decodeChar(const char c)
+{
     const char* pStr;
+    if(c == ' ')
+        pStr = space;
+    else if(isdigit(c))
+        pStr = numeric(c);
     // if c is 0-9
     //      numeric(c)
     // else if c is A-Za-z
     //      alphabetic(c)
-    // else ??
-    return numeric(c);
-}
-
-const char* CHR_getPartialCharacter(const char c, const int row, char* out, const int len)
-{
-    int i;
-    const char* pStr = numeric(c);
-    const char* begin = &pStr[(row * CFG_CHAR_WIDTH)];
-    const char* end = &pStr[(row * (CFG_CHAR_WIDTH + CFG_NEWLINE_SIZE)) + (CFG_CHAR_WIDTH + CFG_NEWLINE_SIZE)];
-
-    // copy the partial character into the output buffer
-    for(i = 0; i < len && begin != end; ++i)
-    {
-        out[i] = *begin;
-        ++begin;
-    }
-
+    // else space, \n, \r
+    // TODO handle math +-*/=()%
+    // TODO handle punctuation .?!,'"
     return pStr;
-}
-
-static void decodeChar(const char c)
-{
-
 }
 
 static const char* numeric(const char c)
@@ -203,9 +228,13 @@ static const char* numeric(const char c)
         case '8': pStr = eight; break;
         case '9': pStr = nine; break;
         default:
-            //pStr = space;
             break;
     }
     return pStr;
 }
 
+static char* generate_space(void)
+{
+
+
+}

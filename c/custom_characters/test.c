@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2019 Douglas Chidester
+    Copyright (c) 2019 objectDisorientedProgrammer
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,40 +15,52 @@
 */
 
 #include "characters.h"
+#include "config.h"
 #include <stdio.h>
 
 int main(int argc, char *argv[])
 {
-    char buf[100];
+    char buf[1024];
 
     for (char i = '0'; i <= '9'; ++i)
     {
         printf("%s\n", CHR_getCharacter(i));
     }
-#if 0
-// TODO combine 2 characters
-    for (int i = 0; i < 5; ++i)
+
+    #define BIG_STR_SIZE 2048
+    char bigString[BIG_STR_SIZE];
+    int next = 0;
+    for (int row = 0; row < CFG_CHAR_HEIGHT; ++row)
     {
-         CHR_getPartialCharacter('2', i, buf + (i * 5), 100);
-         CHR_getPartialCharacter('5', i, buf + (i * 5), 100);
-         buf[i * 5 * 2] = '\n';
+        next = CHR_getPartialCharacter('2', row, bigString, BIG_STR_SIZE, next);
+        next = CHR_getPartialCharacter('0', row, bigString, BIG_STR_SIZE, next);
+        next = CHR_getPartialCharacter('2', row, bigString, BIG_STR_SIZE, next);
+        next = CHR_getPartialCharacter('5', row, bigString, BIG_STR_SIZE, next);
+        bigString[next-1] = '\n'; // end line
     }
-#endif
-#if 2
-// TODO read one character with getPartial() in another change
-    for(int k = 0; k < 5; ++k)
+    // add null terminator to string at last index
+    bigString[next] = '\0';
+    printf("%s", bigString);
+
+
+    next = 0;
+    for (int row = 0; row < CFG_CHAR_HEIGHT; ++row)
     {
-        CHR_getPartialCharacter('2', k, buf+(k*6), 100);
-        buf[k*5+5] = ' ';
-        CHR_getPartialCharacter('1', k, buf+(k*6+6), 100);
-        buf[k*11+11] = '\0';
+        next = CHR_getPartialCharacter('0', row, bigString, BIG_STR_SIZE, next);
+        next = CHR_getPartialCharacter('1', row, bigString, BIG_STR_SIZE, next);
+        next = CHR_getPartialCharacter('2', row, bigString, BIG_STR_SIZE, next);
+        next = CHR_getPartialCharacter('3', row, bigString, BIG_STR_SIZE, next);
+        next = CHR_getPartialCharacter('4', row, bigString, BIG_STR_SIZE, next);
+        next = CHR_getPartialCharacter('5', row, bigString, BIG_STR_SIZE, next);
+        next = CHR_getPartialCharacter('6', row, bigString, BIG_STR_SIZE, next);
+        next = CHR_getPartialCharacter('7', row, bigString, BIG_STR_SIZE, next);
+        next = CHR_getPartialCharacter('8', row, bigString, BIG_STR_SIZE, next);
+        next = CHR_getPartialCharacter('9', row, bigString, BIG_STR_SIZE, next);
+        bigString[next-1] = '\n'; // end line
     }
-    //for(int i = 0; i < 12; ++i)
-    //    printf("'%c'", buf[i]);
-    printf("\n%s\n", buf);
-    //CHR_getPartialCharacter('2', 1, buf+6, 12);
-    //buf[11] = '\0';
-    //printf("\n%s\n", buf);
-#endif
+    // add null terminator to string at last index
+    bigString[next] = '\0';
+    printf("%s", bigString);
+
     return 0;
 }
