@@ -70,6 +70,9 @@ void read_csv(const char *filename)
         char *token = strtok(line, ",");
         while (token != NULL)
         {
+            // special case for comma character since we use CSV
+            if (strncmp(token, "comma", 6) == 0)
+                *token = ',';
             //if (isdigit(*token))
             {
                 char *digit=token;
@@ -182,11 +185,11 @@ void releaseMemory(char **map, int len)
     {
         if (map[i] != NULL)
         {
-            //printf("freeing { %c :'%s'}\n", i, charmap[i]);
+            //printf("freeing { %c :'%s'}\n", i, charmap[i]); // DEBUG
             free(map[i]);
         }
         //else
-        //    printf("%c not defined\n", i);
+        //    printf("%c not defined\n", i); // DEBUG
     }
 }
 
@@ -194,13 +197,12 @@ void read_encoding_from_csv(const char *filename)
 {
     read_csv(filename);
     
-    #if 0 // for testing
+    #if 0 // for testing character rendering
     read_csv("encoding_example.csv");
     printString("0987654321");
     printString("abcdefghij");
     printString("klmnopqrst");
     printString("uvwxyz");
-    releaseMemory(charmap, CHARMAP_SIZE);
     puts("");
     #endif
 }
@@ -257,19 +259,17 @@ int main(int argc, char *argv[])
     if (argc > 1)
     {
         int a = 1;
-        printf("filename = '%s'\n", argv[a]);
         strncpy(filename, argv[a], 1023);
         ++a;
         
         while (argv[a])
         {
+            // TODO make this safe by checking how much buffer is used vs strlen(argv)
             strncat(enormousBuffer, argv[a], 50);
             ++a;
             strncat(enormousBuffer, " ", 2);
         }
         enormousBuffer[strlen(enormousBuffer)-1] = '\0';
-        printf("userStr= '%s'\n", enormousBuffer);
-
     }
     else
     {
