@@ -1,4 +1,4 @@
-programName = 'tester.app'
+programName = 'transcribe'
 
 srcs = Glob('*.c')
 
