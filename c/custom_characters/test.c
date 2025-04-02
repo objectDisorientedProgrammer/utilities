@@ -30,14 +30,25 @@ typedef struct metadata
 } metadata_t;
 
 metadata_t fileinfo;
+#define VALID_ASCII_RANGE_BEGIN 32
+#define VALID_ASCII_RANGE_END 127
 #define CHARMAP_SIZE 128
 char* charmap[CHARMAP_SIZE];
 
 void read_csv(const char *filename)
 {
     FILE *file = fopen(filename, "r");
-    if (file == NULL) {
-        perror("Failed to open file");
+    if (file == NULL)
+    {
+        int size = 23 + strlen(filename);
+        char errorMsg[size];
+        int written = snprintf(errorMsg, size, "Failed to open file: '%s'", filename);
+        if (written >= 0 && written < size)
+        {
+            perror(errorMsg);
+        }
+        else
+            perror("Failed to create error message");
         return;
     }
 
@@ -64,12 +75,20 @@ void read_csv(const char *filename)
     }
 
     // Read each line in the CSV file
+    int lineNumber = 1; // starts at 1 since the 1st line is metadata
     while (fgets(line, sizeof(line), file))
     {
+        ++lineNumber;
         // Tokenize the line by comma
         char *token = strtok(line, ",");
         while (token != NULL)
         {
+            // verify the token is within the valid ASCII range
+            if (*token < VALID_ASCII_RANGE_BEGIN || *token >= VALID_ASCII_RANGE_END)
+            {
+                fprintf(stderr, "Error line %d: character %c (UTF-8 0x%X) not recognized.\n", lineNumber, *token, (int)(*token)&0xFF);
+                break;
+            }
             // special case for comma character since we use CSV
             if (strncmp(token, "comma", 6) == 0)
                 *token = ',';
@@ -80,7 +99,7 @@ void read_csv(const char *filename)
                 char *encoding = (char*) malloc(end * sizeof(char));
                 if (encoding == NULL)
                 {
-                    perror("failed to allocate character encoding memory");
+                    perror("Failed to allocate character encoding");
                     return;
                 }
                 for (int i = 0; i < end-1; ++i)
@@ -251,31 +270,50 @@ int main(int argc, char *argv[])
     bigString[next] = '\0';
     printf("%s", bigString);
     */
-    char enormousBuffer[8192];
-    char filename[1024];
+    #define BUF_SIZE 1024
+    char enormousBuffer[BUF_SIZE * 8];
+    char filename[BUF_SIZE];
+    size_t enormouseBufferRemainingSize = BUF_SIZE * 8;
     
-
     // process command line args
     if (argc > 1)
     {
         int a = 1;
-        strncpy(filename, argv[a], 1023);
+        size_t argLen = strlen(argv[a]);
+        strncpy(filename, argv[a], BUF_SIZE - 1);
+        if (argLen > BUF_SIZE-1)
+        {
+            filename[BUF_SIZE-1]='\0';
+            printf("%s -> %s\n", argv[a], filename);
+            perror("Filename too long");
+            return -1;
+        }
         ++a;
         
         while (argv[a])
         {
-            // TODO make this safe by checking how much buffer is used vs strlen(argv)
-            strncat(enormousBuffer, argv[a], 50);
-            ++a;
-            strncat(enormousBuffer, " ", 2);
+            argLen = strlen(argv[a]);
+            if (enormouseBufferRemainingSize >= argLen + 2)
+            {
+                strncat(enormousBuffer, argv[a], enormouseBufferRemainingSize);
+                enormouseBufferRemainingSize -= argLen;
+                ++a;
+                strncat(enormousBuffer, " ", 2);
+                enormouseBufferRemainingSize -= 2;
+            }
+            else
+            {
+                printf("Error ran out of buffer space. Need %ld, have %ld.", argLen+2, enormouseBufferRemainingSize);
+                break;
+            }
         }
-        enormousBuffer[strlen(enormousBuffer)-1] = '\0';
+        enormousBuffer[(BUF_SIZE * 8) - enormouseBufferRemainingSize - 1] = '\0';
     }
     else
     {
         // default values
         strcpy(filename, "encoding_example.csv"); // default file
-        strcpy(enormousBuffer, "March 27th 2025"); // default string
+        strcpy(enormousBuffer, "March 27, 2025"); // default string
     }
 
     // initialize character map
