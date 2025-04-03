@@ -200,15 +200,15 @@ void printString(char* str)
 
 void releaseMemory(char **map, int len)
 {
-    for (char i = '0'; i <= 'Z'; ++i)
+    for (int i = VALID_ASCII_RANGE_BEGIN; i < CHARMAP_SIZE; ++i)
     {
         if (map[i] != NULL)
         {
-            //printf("freeing { %c :'%s'}\n", i, charmap[i]); // DEBUG
+            // printf("freeing %d { %c :'%s'}\n", i, i, charmap[i]); // DEBUG
             free(map[i]);
         }
-        //else
-        //    printf("%c not defined\n", i); // DEBUG
+        // else
+        //    printf("%d %c not defined\n", i, i); // DEBUG
     }
 }
 
@@ -217,7 +217,10 @@ void read_encoding_from_csv(const char *filename)
     read_csv(filename);
     
     #if 0 // for testing character rendering
-    read_csv("encoding_example.csv");
+    //read_csv("encoding_example.csv");
+    printString("~`!@#$%^&_");
+    printString("()*/-+={}[]");
+    printString(",?.;:'\"");
     printString("0987654321");
     printString("abcdefghij");
     printString("klmnopqrst");
@@ -228,48 +231,6 @@ void read_encoding_from_csv(const char *filename)
 
 int main(int argc, char *argv[])
 {
-    /*char buf[1024];
-
-    for (char i = '0'; i <= '9'; ++i)
-    {
-        printf("%s\n", CHR_getCharacter(i));
-    }
-
-    #define BIG_STR_SIZE 2048
-    char bigString[BIG_STR_SIZE];
-    int next = 0;
-    for (int row = 0; row < CFG_CHAR_HEIGHT; ++row)
-    {
-        next = CHR_getPartialCharacter('2', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('0', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('2', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('5', row, bigString, BIG_STR_SIZE, next);
-        bigString[next-1] = '\n'; // end line
-    }
-    // add null terminator to string at last index
-    bigString[next] = '\0';
-    printf("%s", bigString);
-
-
-    next = 0;
-    for (int row = 0; row < CFG_CHAR_HEIGHT; ++row)
-    {
-        next = CHR_getPartialCharacter('0', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('1', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('2', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('3', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('4', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('5', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('6', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('7', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('8', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('9', row, bigString, BIG_STR_SIZE, next);
-        bigString[next-1] = '\n'; // end line
-    }
-    // add null terminator to string at last index
-    bigString[next] = '\0';
-    printf("%s", bigString);
-    */
     #define BUF_SIZE 1024
     char enormousBuffer[BUF_SIZE * 8];
     char filename[BUF_SIZE];
