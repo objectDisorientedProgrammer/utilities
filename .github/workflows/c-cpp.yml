@@ -31,5 +31,5 @@ jobs:
         pip install scons
     - name: Build c/custom_characters
       run: cd c/custom_characters && scons
-    -name: Run command
-      run: cd c/custom_characters && ./transcribe encoding_example.csv hello github ci!
+    - name: Run command
+      run: cd c/custom_characters && ./transcribe encoding_example.csv hello github ci\!
