@@ -15,111 +15,20 @@
 */
 
 #include "characters.h"
-#include "config.h"
+//#include "config.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct metadata
-{
-    int width;
-    int height;
-    char fill_char;
-    char bg_char;
-} metadata_t;
-
 metadata_t fileinfo;
-#define VALID_ASCII_RANGE_BEGIN 32
-#define VALID_ASCII_RANGE_END 127
-#define CHARMAP_SIZE 128
+
+// #define CHARMAP_SIZE 128
 char* charmap[CHARMAP_SIZE];
 
 void read_csv(const char *filename)
 {
-    FILE *file = fopen(filename, "r");
-    if (file == NULL)
-    {
-        int size = 23 + strlen(filename);
-        char errorMsg[size];
-        int written = snprintf(errorMsg, size, "Failed to open file: '%s'", filename);
-        if (written >= 0 && written < size)
-        {
-            perror(errorMsg);
-        }
-        else
-            perror("Failed to create error message");
-        return;
-    }
-
-    char line[1024];
-
-    // read the width, height, foreground, and background character
-    if (fgets(line, sizeof(line), file))
-    {
-        char *token = strtok(line, ",");
-        if (token != NULL)
-            fileinfo.width = atoi(token);
-        token = strtok(NULL, ",");
-        if (token != NULL)
-            fileinfo.height = atoi(token);
-        token = strtok(NULL, ",");
-        if (token != NULL)
-            fileinfo.fill_char = *token;
-        token = strtok(NULL, ",");
-        if (token != NULL)
-            fileinfo.bg_char = *token;
-        token = strtok(NULL, ",");
-        while (token != NULL)
-            token = strtok(NULL, ",");
-    }
-
-    // Read each line in the CSV file
-    int lineNumber = 1; // starts at 1 since the 1st line is metadata
-    while (fgets(line, sizeof(line), file))
-    {
-        ++lineNumber;
-        // Tokenize the line by comma
-        char *token = strtok(line, ",");
-        while (token != NULL)
-        {
-            // verify the token is within the valid ASCII range
-            if (*token < VALID_ASCII_RANGE_BEGIN || *token >= VALID_ASCII_RANGE_END)
-            {
-                fprintf(stderr, "Error line %d: character %c (UTF-8 0x%X) not recognized.\n", lineNumber, *token, (int)(*token)&0xFF);
-                break;
-            }
-            // special case for comma character since we use CSV
-            if (strncmp(token, "comma", 6) == 0)
-                *token = ',';
-            //if (isdigit(*token))
-            {
-                char *digit=token;
-                int end = fileinfo.width*fileinfo.height+1;
-                char *encoding = (char*) malloc(end * sizeof(char));
-                if (encoding == NULL)
-                {
-                    perror("Failed to allocate character encoding");
-                    return;
-                }
-                for (int i = 0; i < end-1; ++i)
-                {
-                    token = strtok(NULL, ",");
-                    if (token != NULL)
-                    {
-                        //printf("%s ", token);
-                        encoding[i] = *token;
-                    }
-                }
-                encoding[end]='\0';
-                charmap[*digit] = encoding;
-            }
-            token = strtok(NULL, ",");
-        }
-        //printf("\n");
-    }
-
-    fclose(file);
+    return;
 }
 
 void printFullChar(char c)
@@ -212,29 +121,29 @@ void releaseMemory(char **map, int len)
     }
 }
 
-void read_encoding_from_csv(const char *filename)
-{
-    read_csv(filename);
+// void read_encoding_from_csv(const char *filename)
+// {
+//     read_csv(filename);
     
-    #if 0 // for testing character rendering
-    //read_csv("encoding_example.csv");
-    printString("~`!@#$%^&_");
-    printString("()*/-+={}[]");
-    printString(",?.;:'\"");
-    printString("0987654321");
-    printString("abcdefghij");
-    printString("klmnopqrst");
-    printString("uvwxyz");
-    puts("");
-    #endif
-}
+//     #if 0 // for testing character rendering
+//     //read_csv("encoding_example.csv");
+//     printString("~`!@#$%^&_");
+//     printString("()*/-+={}[]");
+//     printString(",?.;:'\"");
+//     printString("0987654321");
+//     printString("abcdefghij");
+//     printString("klmnopqrst");
+//     printString("uvwxyz");
+//     puts("");
+//     #endif
+// }
 
 int main(int argc, char *argv[])
 {
     #define BUF_SIZE 1024
     char enormousBuffer[BUF_SIZE * 8];
     char filename[BUF_SIZE];
-    size_t enormouseBufferRemainingSize = BUF_SIZE * 8;
+    size_t enormousBufferRemainingSize = BUF_SIZE * 8;
     
     // process command line args
     if (argc > 1)
@@ -254,21 +163,21 @@ int main(int argc, char *argv[])
         while (argv[a])
         {
             argLen = strlen(argv[a]);
-            if (enormouseBufferRemainingSize >= argLen + 2)
+            if (enormousBufferRemainingSize >= argLen + 2)
             {
-                strncat(enormousBuffer, argv[a], enormouseBufferRemainingSize);
-                enormouseBufferRemainingSize -= argLen;
+                strncat(enormousBuffer, argv[a], enormousBufferRemainingSize);
+                enormousBufferRemainingSize -= argLen;
                 ++a;
                 strncat(enormousBuffer, " ", 2);
-                enormouseBufferRemainingSize -= 2;
+                enormousBufferRemainingSize -= 2;
             }
             else
             {
-                printf("Error ran out of buffer space. Need %ld, have %ld.", argLen+2, enormouseBufferRemainingSize);
+                printf("Error ran out of buffer space. Need %ld, have %ld.", argLen+2, enormousBufferRemainingSize);
                 break;
             }
         }
-        enormousBuffer[(BUF_SIZE * 8) - enormouseBufferRemainingSize - 1] = '\0';
+        enormousBuffer[(BUF_SIZE * 8) - enormousBufferRemainingSize - 1] = '\0';
     }
     else
     {
@@ -277,14 +186,22 @@ int main(int argc, char *argv[])
         strcpy(enormousBuffer, "March 27, 2025"); // default string
     }
 
+    encoding_t enc;
+    enc.char_map = charmap;
+    enc.char_map_size = CHARMAP_SIZE;
+
     // initialize character map
-    memset(charmap, 0, CHARMAP_SIZE);
+    memset(charmap, 0, CHARMAP_SIZE * sizeof(char));
 
-    read_encoding_from_csv(filename);
+    if (1 == CHR_read_encoding_from_csv(filename, strlen(filename), &enc))
+    {
+        fileinfo = enc.meta;
+        printString(enormousBuffer);
 
-    printString(enormousBuffer);
+        releaseMemory(charmap, CHARMAP_SIZE * sizeof(char));
+    }
 
-    releaseMemory(charmap, CHARMAP_SIZE);
+    
 
     return 0;
 }

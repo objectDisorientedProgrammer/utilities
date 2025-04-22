@@ -40,8 +40,3 @@ Note that the output may become garbled if the terminal window is too small for 
 
 ### Building
 This project uses SCons build system. Run `scons` from the directory to build and `scons -c` to clean.
-
-
-### ToDo
-- [ ] Implement the ability to write to a file
-- [ ] Implement the ability to read from a file

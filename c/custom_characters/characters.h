@@ -20,8 +20,29 @@
 extern "C" {
 #endif
 
-const char* CHR_getCharacter(const char c);
-int CHR_getPartialCharacter(const char c, const int row, char* out, const int len, int offset);
+#define VALID_ASCII_RANGE_BEGIN 32
+#define VALID_ASCII_RANGE_END 127
+#define CHARMAP_SIZE 128
+
+typedef struct metadata
+{
+    int width;
+    int height;
+    char fill_char;
+    char bg_char;
+} metadata_t;
+
+typedef struct encoding
+{
+   char **char_map;
+   int char_map_size;
+   metadata_t meta;
+} encoding_t;
+
+int CHR_read_encoding_from_csv(const char *filename, const int length, encoding_t* encode);
+
+// const char* CHR_getCharacter(const char c);
+// int CHR_getPartialCharacter(const char c, const int row, char* out, const int len, int offset);
 
 #ifdef __cplusplus
 }
