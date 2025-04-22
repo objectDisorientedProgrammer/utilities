@@ -40,6 +40,7 @@ typedef struct encoding
 } encoding_t;
 
 int CHR_read_encoding_from_csv(const char *filename, const int length, encoding_t* encode);
+void CHR_cleanup(const encoding_t* enc);
 
 // const char* CHR_getCharacter(const char c);
 // int CHR_getPartialCharacter(const char c, const int row, char* out, const int len, int offset);

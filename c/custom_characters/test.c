@@ -92,7 +92,7 @@ void printString(char* str)
     char linebuffer[linebufferSize];
     int bufferIndex = 0;
 
-    puts("");
+    //puts("");
     for (int row = 0; row < fileinfo.height; ++row)
     {
         bufferIndex = 0;
@@ -104,20 +104,6 @@ void printString(char* str)
         // send buffer to stdout
         linebuffer[bufferIndex-1] = '\0';
         printf("%s\n", linebuffer);
-    }
-}
-
-void releaseMemory(char **map, int len)
-{
-    for (int i = VALID_ASCII_RANGE_BEGIN; i < CHARMAP_SIZE; ++i)
-    {
-        if (map[i] != NULL)
-        {
-            // printf("freeing %d { %c :'%s'}\n", i, i, charmap[i]); // DEBUG
-            free(map[i]);
-        }
-        // else
-        //    printf("%d %c not defined\n", i, i); // DEBUG
     }
 }
 
@@ -197,11 +183,8 @@ int main(int argc, char *argv[])
     {
         fileinfo = enc.meta;
         printString(enormousBuffer);
-
-        releaseMemory(charmap, CHARMAP_SIZE * sizeof(char));
     }
-
+    CHR_cleanup(&enc);
     
-
     return 0;
 }

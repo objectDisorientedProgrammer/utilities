@@ -114,7 +114,7 @@ int CHR_read_encoding_from_csv(const char *filename, const int length, encoding_
                     }
                 }
                 encoding[end]='\0';
-                encode->char_map[*digit] = encoding;
+                encode->char_map[(int)*digit] = encoding;
             }
             token = strtok(NULL, ",");
         }
@@ -123,6 +123,20 @@ int CHR_read_encoding_from_csv(const char *filename, const int length, encoding_
 
     fclose(file);
     return 1;
+}
+
+void CHR_cleanup(const encoding_t* enc)
+{
+    for (int i = VALID_ASCII_RANGE_BEGIN; i < enc->char_map_size; ++i)
+    {
+        if (enc->char_map[i] != NULL)
+        {
+            // printf("freeing %d { %c :'%s'}\n", i, i, enc->char_map[i]); // DEBUG
+            free(enc->char_map[i]);
+        }
+        // else
+        //    printf("%d %c not defined\n", i, i); // DEBUG
+    }
 }
 
 static const char* decodeChar(const char c)
