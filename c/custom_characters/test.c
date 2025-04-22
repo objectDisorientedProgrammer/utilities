@@ -23,38 +23,11 @@
 
 metadata_t fileinfo;
 
-// #define CHARMAP_SIZE 128
 char* charmap[CHARMAP_SIZE];
 
 void read_csv(const char *filename)
 {
     return;
-}
-
-void printFullChar(char c)
-{
-    for (int i = 0; charmap[c][i] != '\0'; ++i)
-    {
-        if (i != 0 && i % fileinfo.width == 0)
-            printf("\n");
-        if (charmap[c][i] == 'b')
-        {
-            printf("%c", fileinfo.bg_char);
-        }
-        else if (charmap[c][i] == 'f')
-        {
-            printf("%c", fileinfo.fill_char);
-        }
-    }
-    puts("");
-}
-
-void printCharacters(char* word)
-{
-    puts("");
-    for (int c=0; word[c]; ++c)
-        printFullChar(toupper(word[c]));
-    puts("");
 }
 
 int bufferChar(char c, int startIndex, char *buf, int buf_size, int row)
@@ -70,7 +43,7 @@ int bufferChar(char c, int startIndex, char *buf, int buf_size, int row)
         int i;
         for (i = 0; i < fileinfo.width; ++i)
         {
-            buf[startIndex] = table[c][row * (fileinfo.width) + i] == 'b' ? fileinfo.bg_char : fileinfo.fill_char;
+            buf[startIndex] = table[c][row * (fileinfo.width) + i];
             ++startIndex;
         }
         // if the character is not space, add padding between characters
@@ -107,12 +80,10 @@ void printString(char* str)
     }
 }
 
-// void read_encoding_from_csv(const char *filename)
+// void print_encoding(void)
 // {
-//     read_csv(filename);
     
 //     #if 0 // for testing character rendering
-//     //read_csv("encoding_example.csv");
 //     printString("~`!@#$%^&_");
 //     printString("()*/-+={}[]");
 //     printString(",?.;:'\"");
@@ -183,6 +154,11 @@ int main(int argc, char *argv[])
     {
         fileinfo = enc.meta;
         printString(enormousBuffer);
+        if (CHR_getCharacter('a', &enc, enormousBuffer, BUF_SIZE)) printf("%s\n", enormousBuffer);
+        if (CHR_getCharacter('r', &enc, enormousBuffer, BUF_SIZE)) printf("%s\n", enormousBuffer);
+        if (CHR_getCharacter('c', &enc, enormousBuffer, BUF_SIZE)) printf("%s\n", enormousBuffer);
+        if (CHR_getCharacter('h', &enc, enormousBuffer, BUF_SIZE)) printf("%s\n", enormousBuffer);
+        puts("");
     }
     CHR_cleanup(&enc);
     

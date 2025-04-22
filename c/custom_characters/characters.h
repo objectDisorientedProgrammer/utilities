@@ -23,6 +23,8 @@ extern "C" {
 #define VALID_ASCII_RANGE_BEGIN 32
 #define VALID_ASCII_RANGE_END 127
 #define CHARMAP_SIZE 128
+#define BACKGROUND_CHARACTER 'b'
+#define FOREGROUND_CHARACTER 'f'
 
 typedef struct metadata
 {
@@ -42,7 +44,16 @@ typedef struct encoding
 int CHR_read_encoding_from_csv(const char *filename, const int length, encoding_t* encode);
 void CHR_cleanup(const encoding_t* enc);
 
-// const char* CHR_getCharacter(const char c);
+/**
+ * Get an entire, single character into a buffer.
+ * @param[in] ch The character to get.
+ * @param[in] enc The character encoding to use.
+ * @param[out] buffer The place to hold the decoded character.
+ * @param[in] buffer_size The size of the buffer.
+ *
+ * @return 1 if the character is populated into the buffer, otherwise 0.
+ */
+int CHR_getCharacter(const char ch, const encoding_t* enc, char *buffer, const int buffer_size);
 // int CHR_getPartialCharacter(const char c, const int row, char* out, const int len, int offset);
 
 #ifdef __cplusplus

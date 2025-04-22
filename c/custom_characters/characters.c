@@ -15,7 +15,6 @@
 */
 
 #include "characters.h"
-#include "config.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,9 +26,39 @@ static const char* numeric(const char c);
 static char* alphabetic(char c);
 static char* generate_space(void);
 
-const char* CHR_getCharacter(const char c)
+int CHR_getCharacter(const char ch, const encoding_t* enc, char *buffer, const int buffer_size)
 {
-    return decodeChar(c);
+    /* Required length is larger than charWidth*charHeight since we add a newline
+       to the end of each letter segment so it displays propperly and a +1 for \0.
+    */
+    //                                 newline                 null terminator
+    int requiredLen = ((enc->meta.width + 1) * enc->meta.height) + 1;
+    int ch_index = (int) toupper(ch);
+
+    // validate input pointers
+    if (enc == NULL || buffer == NULL)
+        return 0;
+    // check for valid character index in map
+    else if (ch_index < VALID_ASCII_RANGE_BEGIN || ch_index > VALID_ASCII_RANGE_END)
+        return 0;
+    // ensure the buffer is big enough to hold a character
+    else if (buffer_size < requiredLen)
+        return 0;
+
+    // Populate the buffer
+    int buf_index = 0;
+    for (int i = 0; buf_index < requiredLen && enc->char_map[ch_index][i] != '\0'; ++i, ++buf_index)
+    {
+        // add a newline at the end of each letter row segment
+        if (i != 0 && i % enc->meta.width == 0)
+        {
+            buffer[buf_index] = '\n';
+            ++buf_index;
+        }
+        buffer[buf_index] = enc->char_map[ch_index][i];
+    }
+    buffer[buf_index] = '\0';
+    return 1;
 }
 
 int CHR_getPartialCharacter(const char c, const int row, char* out, const int len, int offset)
@@ -110,7 +139,8 @@ int CHR_read_encoding_from_csv(const char *filename, const int length, encoding_
                     if (token != NULL)
                     {
                         //printf("%s ", token);
-                        encoding[i] = *token;
+                        // decode and store character
+                        encoding[i] = (*token == BACKGROUND_CHARACTER) ? encode->meta.bg_char : encode->meta.fill_char;
                     }
                 }
                 encoding[end]='\0';
