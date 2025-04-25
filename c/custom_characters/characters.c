@@ -20,19 +20,54 @@
 #include <stdlib.h>
 #include <string.h>
 
+int CHR_get_string(const char *str, const int str_len, const encoding_t* enc, char *buffer, const int buffer_size)
+{
+    // validate input pointers
+    if (str == NULL || enc == NULL || buffer == NULL)
+        return 0;
+    // ensure the buffer is big enough to hold the string
 
-static const char* decodeChar(const char c);
-static const char* numeric(const char c);
-static char* alphabetic(char c);
-static char* generate_space(void);
+    int index = 0;
+    // create the string, row by row
+    for (int row = 0; row < enc->meta.height; ++row)
+    {
+        // add each character in the row
+        for (int c = 0; str[c]; ++c)
+        {
+            // If the character is space and not the first character in the string,
+            // backtrack the buffer index since each normal character ends with
+            // an extra space appended. This ensures space is the correct width.
+            if (str[c] == ' ' && index > 0)
+                --index;
+            if (1 != CHR_get_partial_character(str[c], enc, row,  buffer, buffer_size, &index))
+            {
+                // error, complete string and return
+                buffer[index] = '\0';
+                return -1;
+            }
+            // if the character is not space, add padding between characters
+            if (str[c] != ' ')
+            {
+                buffer[index] = ' ';
+                ++index;
+            }
+        }
+        // complete the row
+        buffer[index-1] = '\n';
+    }
+    // complete the string
+    buffer[index-1] = '\0';
 
-int CHR_getCharacter(const char ch, const encoding_t* enc, char *buffer, const int buffer_size)
+    return 1;
+}
+
+int CHR_get_character(const char ch, const encoding_t* enc, char *buffer, const int buffer_size)
 {
     /* Required length is larger than charWidth*charHeight since we add a newline
        to the end of each letter segment so it displays propperly and a +1 for \0.
     */
     //                                 newline                 null terminator
-    int requiredLen = ((enc->meta.width + 1) * enc->meta.height) + 1;
+    int required_len = ((enc->meta.width + 1) * enc->meta.height) + 1;
     int ch_index = (int) toupper(ch);
 
     // validate input pointers
@@ -42,12 +77,12 @@ int CHR_getCharacter(const char ch, const encoding_t* enc, char *buffer, const i
     else if (ch_index < VALID_ASCII_RANGE_BEGIN || ch_index > VALID_ASCII_RANGE_END)
         return 0;
     // ensure the buffer is big enough to hold a character
-    else if (buffer_size < requiredLen)
+    else if (buffer_size < required_len)
         return 0;
 
     // Populate the buffer
     int buf_index = 0;
-    for (int i = 0; buf_index < requiredLen && enc->char_map[ch_index][i] != '\0'; ++i, ++buf_index)
+    for (int i = 0; buf_index < required_len && enc->char_map[ch_index][i] != '\0'; ++i, ++buf_index)
     {
         // add a newline at the end of each letter row segment
         if (i != 0 && i % enc->meta.width == 0)
@@ -57,13 +92,38 @@ int CHR_getCharacter(const char ch, const encoding_t* enc, char *buffer, const i
         }
         buffer[buf_index] = enc->char_map[ch_index][i];
     }
+    // Terminate string using buf_index because required_len is oversized
     buffer[buf_index] = '\0';
     return 1;
 }
 
-int CHR_getPartialCharacter(const char c, const int row, char* out, const int len, int offset)
+int CHR_get_partial_character(const char ch, const encoding_t* enc, const int char_row, char* buffer, const int buffer_size, int* buffer_index)
 {
-    return 0;
+    int ch_index = (int) toupper(ch);
+
+    // validate input pointers
+    if (enc == NULL || buffer == NULL || buffer_index == NULL)
+        return 0;
+    // check for valid character index in map
+    else if (ch_index < VALID_ASCII_RANGE_BEGIN || ch_index > VALID_ASCII_RANGE_END)
+        return 0;
+    // invalid row
+    else if (char_row > enc->meta.height)
+        return 0;
+
+    // if there is room in the buffer and the character is defined, get the decoded row
+    if ((*buffer_index) + enc->meta.width < buffer_size && enc->char_map[ch_index] != NULL)
+    {
+        for (int i = 0; i < enc->meta.width; ++i)
+        {
+            buffer[*buffer_index] = enc->char_map[ch_index][char_row * (enc->meta.width) + i];
+            ++(*buffer_index);
+        }
+    }
+    else
+        return 0;
+
+    return 1;
 }
 
 int CHR_read_encoding_from_csv(const char *filename, const int length, encoding_t* encode)
@@ -106,10 +166,10 @@ int CHR_read_encoding_from_csv(const char *filename, const int length, encoding_
     }
 
     // Read each line in the CSV file
-    int lineNumber = 1; // starts at 1 since the 1st line is metadata
+    int line_number = 1; // starts at 1 since the 1st line (line_number zero) is metadata
     while (fgets(line, sizeof(line), file))
     {
-        ++lineNumber;
+        ++line_number;
         // Tokenize the line by comma
         char *token = strtok(line, ",");
         while (token != NULL)
@@ -117,7 +177,7 @@ int CHR_read_encoding_from_csv(const char *filename, const int length, encoding_
             // verify the token is within the valid ASCII range
             if (*token < VALID_ASCII_RANGE_BEGIN || *token >= VALID_ASCII_RANGE_END)
             {
-                fprintf(stderr, "Error line %d: character %c (UTF-8 0x%X) not recognized.\n", lineNumber, *token, (int)(*token)&0xFF);
+                fprintf(stderr, "Error line %d: character %c (UTF-8 0x%X) not recognized.\n", line_number, *token, (int)(*token)&0xFF);
                 break;
             }
             // special case for comma character since we use CSV
@@ -167,48 +227,4 @@ void CHR_cleanup(const encoding_t* enc)
         // else
         //    printf("%d %c not defined\n", i, i); // DEBUG
     }
-}
-
-static const char* decodeChar(const char c)
-{
-    const char* pStr;
-    /*if(c == ' ')
-        pStr = space;
-    else if(isdigit(c))
-        pStr = numeric(c);*/
-    // if c is 0-9
-    //      numeric(c)
-    // else if c is A-Za-z
-    //      alphabetic(c)
-    // else space, \n, \r
-    // TODO handle math +-*/=()%
-    // TODO handle punctuation .?!,'"
-    return pStr;
-}
-
-static const char* numeric(const char c)
-{
-    const char* pStr;
-    // switch(c)
-    // {
-    //     case '0': pStr = zero; break;
-    //     case '1': pStr = one; break;
-    //     case '2': pStr = two; break;
-    //     case '3': pStr = three; break;
-    //     case '4': pStr = four; break;
-    //     case '5': pStr = five; break;
-    //     case '6': pStr = six; break;
-    //     case '7': pStr = seven; break;
-    //     case '8': pStr = eight; break;
-    //     case '9': pStr = nine; break;
-    //     default:
-    //         break;
-    // }
-    return pStr;
-}
-
-static char* generate_space(void)
-{
-    return NULL;
-
 }

@@ -23,7 +23,7 @@
 metadata_t fileinfo;
 
 char* charmap[CHARMAP_SIZE];
-
+/*
 void read_csv(const char *filename)
 {
     return;
@@ -53,8 +53,8 @@ int bufferChar(char c, int startIndex, char *buf, int buf_size, int row)
         }
     }
     return startIndex;
-}
-
+}*/
+/*
 void printString(char* str)
 {
     int len = strlen(str);
@@ -78,7 +78,7 @@ void printString(char* str)
         printf("%s\n", linebuffer);
     }
 }
-
+*/
 // void print_encoding(void)
 // {
     
@@ -100,6 +100,10 @@ int main(int argc, char *argv[])
     char enormousBuffer[BUF_SIZE * 8];
     char filename[BUF_SIZE];
     size_t enormousBufferRemainingSize = BUF_SIZE * 8;
+
+    char input[BUF_SIZE];
+    size_t inputRemainingSize = BUF_SIZE;
+    int isDefault = 0;
     
     // process command line args
     if (argc > 1)
@@ -121,25 +125,27 @@ int main(int argc, char *argv[])
             argLen = strlen(argv[a]);
             if (enormousBufferRemainingSize >= argLen + 2)
             {
-                strncat(enormousBuffer, argv[a], enormousBufferRemainingSize);
-                enormousBufferRemainingSize -= argLen;
+                strncat(input, argv[a], inputRemainingSize);
+                inputRemainingSize -= argLen;
                 ++a;
-                strncat(enormousBuffer, " ", 2);
-                enormousBufferRemainingSize -= 2;
+                strncat(input, " ", 2);
+                inputRemainingSize -= 2;
             }
             else
             {
-                printf("Error ran out of buffer space. Need %ld, have %ld.", argLen+2, enormousBufferRemainingSize);
+                printf("Error ran out of buffer space. Need %ld, have %ld.", argLen+2, inputRemainingSize);
                 break;
             }
         }
-        enormousBuffer[(BUF_SIZE * 8) - enormousBufferRemainingSize - 1] = '\0';
+        input[(BUF_SIZE * 8) - enormousBufferRemainingSize - 1] = '\0';
     }
     else
     {
         // default values
         strcpy(filename, "encoding_example.csv"); // default file
-        strcpy(enormousBuffer, "March 27, 2025"); // default string
+        strcpy(input, "March 27, 2025"); // default string
+        inputRemainingSize = BUF_SIZE - 16;
+        isDefault = 1;
     }
 
     encoding_t enc;
@@ -151,13 +157,18 @@ int main(int argc, char *argv[])
 
     if (1 == CHR_read_encoding_from_csv(filename, strlen(filename), &enc))
     {
-        fileinfo = enc.meta;
-        printString(enormousBuffer);
-        if (CHR_getCharacter('a', &enc, enormousBuffer, BUF_SIZE)) printf("%s\n", enormousBuffer);
-        if (CHR_getCharacter('r', &enc, enormousBuffer, BUF_SIZE)) printf("%s\n", enormousBuffer);
-        if (CHR_getCharacter('c', &enc, enormousBuffer, BUF_SIZE)) printf("%s\n", enormousBuffer);
-        if (CHR_getCharacter('h', &enc, enormousBuffer, BUF_SIZE)) printf("%s\n", enormousBuffer);
-        puts("");
+        if (CHR_get_string(input, BUF_SIZE - inputRemainingSize, &enc, enormousBuffer, BUF_SIZE))
+            printf("%s\n", enormousBuffer);
+        else
+            puts("error printing string");
+        if (isDefault)
+        {
+            if (CHR_get_character('a', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
+            if (CHR_get_character('r', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
+            if (CHR_get_character('c', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
+            if (CHR_get_character('h', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
+            puts("");
+        }
     }
     CHR_cleanup(&enc);
     
