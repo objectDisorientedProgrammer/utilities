@@ -1,8 +1,8 @@
-programName = 'tester.app'
+programName = 'transcribe'
 
-srcs = Glob('*.c')
+srcs = ['test.c', 'characters.c'] #Glob('*.c')
 
 # can use CC = clang if installed
-env = Environment(CC = 'gcc', CCFLAGS = '-std=gnu99 -O0 -ggdb')
+env = Environment(CC = 'gcc', CCFLAGS = '-std=gnu99 -O0 -ggdb  -Wall') # -fsanitize=address
 
 env.Program(programName, srcs)

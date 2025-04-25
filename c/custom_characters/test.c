@@ -15,52 +15,118 @@
 */
 
 #include "characters.h"
-#include "config.h"
+#include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define BUF_SIZE 1024
+
+
+void printString(const char* str, const encoding_t* enc)
+{
+    int slen = strlen(str);
+    char output[BUF_SIZE];
+
+    if (CHR_get_string(str, slen, enc, output, BUF_SIZE-1))
+        printf("%s\n\n", output);
+    else
+        printf("error printing: '%s'\n", str);
+}
+
+void print_encoding(const encoding_t* enc)
+{
+    // for testing character rendering
+    printString("~`!@#$ %^&", enc);
+    printString("_()*/-+={}", enc);
+    printString("[],?.;:'\"", enc);
+    printString("0987654321", enc);
+    printString("abcdefghij", enc);
+    printString("klmnopqrst", enc);
+    printString("uvwxyz", enc);
+    puts("");
+}
 
 int main(int argc, char *argv[])
 {
-    char buf[1024];
+    char* charmap[CHARMAP_SIZE];
 
-    for (char i = '0'; i <= '9'; ++i)
+    char enormousBuffer[BUF_SIZE * 8];
+    char filename[BUF_SIZE];
+    size_t enormousBufferRemainingSize = BUF_SIZE * 8;
+
+    char input[BUF_SIZE];
+    size_t inputRemainingSize = BUF_SIZE;
+    int isDefault = 0;
+    
+    // process command line args
+    if (argc > 1)
     {
-        printf("%s\n", CHR_getCharacter(i));
+        int a = 1;
+        size_t argLen = strlen(argv[a]);
+        strncpy(filename, argv[a], BUF_SIZE - 1);
+        if (argLen > BUF_SIZE-1)
+        {
+            filename[BUF_SIZE-1]='\0';
+            printf("%s -> %s\n", argv[a], filename);
+            perror("Filename too long");
+            return -1;
+        }
+        ++a;
+        
+        while (argv[a])
+        {
+            argLen = strlen(argv[a]);
+            if (enormousBufferRemainingSize >= argLen + 2)
+            {
+                strncat(input, argv[a], inputRemainingSize);
+                inputRemainingSize -= argLen;
+                ++a;
+                strncat(input, " ", 2);
+                inputRemainingSize -= 2;
+            }
+            else
+            {
+                printf("Error ran out of buffer space. Need %ld, have %ld.", argLen+2, inputRemainingSize);
+                break;
+            }
+        }
+        input[(BUF_SIZE * 8) - enormousBufferRemainingSize - 1] = '\0';
+    }
+    else
+    {
+        // default values
+        strcpy(filename, "encoding_example.csv"); // default file
+        strcpy(input, "March 27, 2025"); // default string
+        inputRemainingSize = BUF_SIZE - 16;
+        isDefault = 1;
     }
 
-    #define BIG_STR_SIZE 2048
-    char bigString[BIG_STR_SIZE];
-    int next = 0;
-    for (int row = 0; row < CFG_CHAR_HEIGHT; ++row)
+    encoding_t enc;
+    enc.char_map = charmap;
+    enc.char_map_size = CHARMAP_SIZE;
+
+    // initialize character map
+    memset(charmap, 0, CHARMAP_SIZE * sizeof(char));
+
+    if (1 == CHR_read_encoding_from_csv(filename, strlen(filename), &enc))
     {
-        next = CHR_getPartialCharacter('2', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('0', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('2', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('5', row, bigString, BIG_STR_SIZE, next);
-        bigString[next-1] = '\n'; // end line
+        if (CHR_get_string(input, BUF_SIZE - inputRemainingSize, &enc, enormousBuffer, BUF_SIZE))
+            printf("%s\n", enormousBuffer);
+        else
+            puts("error printing string");
+        if (isDefault)
+        {
+            if (CHR_get_character('a', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
+            if (CHR_get_character('r', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
+            if (CHR_get_character('c', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
+            if (CHR_get_character('h', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
+            puts("");
+        }
+
+        //print_encoding(&enc); // DEBUG
     }
-    // add null terminator to string at last index
-    bigString[next] = '\0';
-    printf("%s", bigString);
-
-
-    next = 0;
-    for (int row = 0; row < CFG_CHAR_HEIGHT; ++row)
-    {
-        next = CHR_getPartialCharacter('0', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('1', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('2', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('3', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('4', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('5', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('6', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('7', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('8', row, bigString, BIG_STR_SIZE, next);
-        next = CHR_getPartialCharacter('9', row, bigString, BIG_STR_SIZE, next);
-        bigString[next-1] = '\n'; // end line
-    }
-    // add null terminator to string at last index
-    bigString[next] = '\0';
-    printf("%s", bigString);
-
+    CHR_cleanup(&enc);
+    
     return 0;
 }

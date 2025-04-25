@@ -20,8 +20,84 @@
 extern "C" {
 #endif
 
-const char* CHR_getCharacter(const char c);
-int CHR_getPartialCharacter(const char c, const int row, char* out, const int len, int offset);
+#define VALID_ASCII_RANGE_BEGIN 32
+#define VALID_ASCII_RANGE_END 127
+#define CHARMAP_SIZE 128
+#define BACKGROUND_CHARACTER 'b'
+#define FOREGROUND_CHARACTER 'f'
+
+typedef struct metadata
+{
+    int width;
+    int height;
+    char fill_char;
+    char bg_char;
+} metadata_t;
+
+typedef struct encoding
+{
+   char **char_map;
+   int char_map_size;
+   metadata_t meta;
+} encoding_t;
+
+/**
+ * Load an encoding from a CSV file. CALL THIS FIRST!
+ * @param[in] filename The file to read from.
+ * @param[in] length Filename length.
+ * @param[out] encode An encoding variable to populate.
+ *
+ * @return 1 if the encoding is loaded from the file, otherwise 0.
+ */
+int CHR_read_encoding_from_csv(const char *filename, const int length, encoding_t* encode);
+
+/**
+ * Release all resources used by an encoding. CALL THIS BEFORE PROGRAM EXIT!
+ * @param[in] enc The encoding to remove.
+ */
+void CHR_cleanup(const encoding_t* enc);
+
+/**
+ * Convert a string into a buffer.
+ * @param[in] str The string to convert.
+ * @param[in] str_len The length of the string to convert.
+ * @param[in] enc The character encoding.
+ * @param[out] buffer The place to hold the decoded character.
+ * @param[in] buffer_size The size of the buffer.
+ *
+ * @note A null terminator is appended when using this function.
+ *
+ * @return 1 if the entire string is converted, -1 if the string is partially converted, and 0 for other errors.
+ */
+int CHR_get_string(const char *str, const int str_len, const encoding_t* enc, char *buffer, const int buffer_size);
+
+/**
+ * Get an entire, single character into a buffer.
+ * @param[in] ch The character to get.
+ * @param[in] enc The character encoding to use.
+ * @param[out] buffer The place to hold the decoded character.
+ * @param[in] buffer_size The size of the buffer.
+ *
+ * @note A null terminator is appended when using this function.
+ *
+ * @return 1 if the character is populated into the buffer, otherwise 0.
+ */
+int CHR_get_character(const char ch, const encoding_t* enc, char *buffer, const int buffer_size);
+
+/**
+ * Get a row for a single character into a buffer.
+ * @param[in] ch The character to get.
+ * @param[in] enc The character encoding to use.
+ * @param[in] char_row The row of the character.
+ * @param[out] buffer The place to hold the decoded character.
+ * @param[in] buffer_size The size of the buffer.
+ * @param[in/out] buffer_index The index to begin within the buffer and the new ending index.
+ *
+ * @note No null terminator is appended when using this function.
+ *
+ * @return 1 if the character row is populated into the buffer, otherwise 0.
+ */
+int CHR_get_partial_character(const char ch, const encoding_t* enc, const int char_row, char* buffer, const int buffer_size, int* buffer_index);
 
 #ifdef __cplusplus
 }

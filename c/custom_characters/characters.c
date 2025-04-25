@@ -15,226 +15,216 @@
 */
 
 #include "characters.h"
-#include "config.h"
 #include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-// minimum character array; height * width + height (for newlines) + 1 (null terminator)
-#define MIN_ARRAY_SIZE    CFG_CHAR_HEIGHT * CFG_CHAR_WIDTH + CFG_CHAR_HEIGHT + 1
-
-// defines for zero
-#define CH_ZERO_0    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_ZERO_1    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_ZERO_2    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_ZERO_3    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_ZERO_4    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_FULL_ZERO CH_ZERO_0, '\n',\
-                     CH_ZERO_1, '\n',\
-                     CH_ZERO_2, '\n',\
-                     CH_ZERO_3, '\n',\
-                     CH_ZERO_4, '\n', '\0'
-const char zero[MIN_ARRAY_SIZE] =  { CH_FULL_ZERO };
-
-// defines for one
-#define CH_ONE_0    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_ONE_1    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_ONE_2    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_ONE_3    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_ONE_4    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR
-#define CH_FULL_ONE CH_ONE_0, '\n',\
-                    CH_ONE_1, '\n',\
-                    CH_ONE_2, '\n',\
-                    CH_ONE_3, '\n',\
-                    CH_ONE_4, '\n', '\0'
-const char one[MIN_ARRAY_SIZE] =  { CH_FULL_ONE };
-
-// defines for two
-#define CH_TWO_0    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_TWO_1    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_TWO_2    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_TWO_3    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_TWO_4    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR
-#define CH_FULL_TWO CH_TWO_0, '\n',\
-                    CH_TWO_1, '\n',\
-                    CH_TWO_2, '\n',\
-                    CH_TWO_3, '\n',\
-                    CH_TWO_4, '\n', '\0'
-const char two[MIN_ARRAY_SIZE] =  { CH_FULL_TWO };
-
-// defines for three
-#define CH_THREE_0    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_THREE_1    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_THREE_2    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_THREE_3    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_THREE_4    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_FULL_THREE CH_THREE_0, '\n',\
-                      CH_THREE_1, '\n',\
-                      CH_THREE_2, '\n',\
-                      CH_THREE_3, '\n',\
-                      CH_THREE_4, '\n', '\0'
-const char three[MIN_ARRAY_SIZE] =  { CH_FULL_THREE };
-
-// defines for four
-#define CH_FOUR_0    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_FOUR_1    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_FOUR_2    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_FOUR_3    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR
-#define CH_FOUR_4    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_FULL_FOUR CH_FOUR_0, '\n',\
-                     CH_FOUR_1, '\n',\
-                     CH_FOUR_2, '\n',\
-                     CH_FOUR_3, '\n',\
-                     CH_FOUR_4, '\n', '\0'
-const char four[MIN_ARRAY_SIZE] =  { CH_FULL_FOUR };
-
-// defines for five
-#define CH_FIVE_0    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR
-#define CH_FIVE_1    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_FIVE_2    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_FIVE_3    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_FIVE_4    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_FULL_FIVE CH_FIVE_0, '\n',\
-                     CH_FIVE_1, '\n',\
-                     CH_FIVE_2, '\n',\
-                     CH_FIVE_3, '\n',\
-                     CH_FIVE_4, '\n', '\0'
-const char five[MIN_ARRAY_SIZE] =  { CH_FULL_FIVE };
-
-// defines for six
-#define CH_SIX_0    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR
-#define CH_SIX_1    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_SIX_2    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_SIX_3    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_SIX_4    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_FULL_SIX CH_SIX_0, '\n',\
-                     CH_SIX_1, '\n',\
-                     CH_SIX_2, '\n',\
-                     CH_SIX_3, '\n',\
-                     CH_SIX_4, '\n', '\0'
-const char six[MIN_ARRAY_SIZE] =  { CH_FULL_SIX };
-
-// defines for seven
-#define CH_SEVEN_0    CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR
-#define CH_SEVEN_1    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_SEVEN_2    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_SEVEN_3    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_SEVEN_4    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_FULL_SEVEN CH_SEVEN_0, '\n',\
-                     CH_SEVEN_1, '\n',\
-                     CH_SEVEN_2, '\n',\
-                     CH_SEVEN_3, '\n',\
-                     CH_SEVEN_4, '\n', '\0'
-const char seven[MIN_ARRAY_SIZE] =  { CH_FULL_SEVEN };
-
-// defines for eight
-#define CH_EIGHT_0    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_EIGHT_1    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_EIGHT_2    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_EIGHT_3    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_EIGHT_4    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_FULL_EIGHT CH_EIGHT_0, '\n',\
-                     CH_EIGHT_1, '\n',\
-                     CH_EIGHT_2, '\n',\
-                     CH_EIGHT_3, '\n',\
-                     CH_EIGHT_4, '\n', '\0'
-const char eight[MIN_ARRAY_SIZE] =  { CH_FULL_EIGHT };
-
-// defines for nine
-#define CH_NINE_0    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_EMPTY_CHAR
-#define CH_NINE_1    CFG_FILLR_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_NINE_2    CFG_EMPTY_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR, CFG_FILLR_CHAR
-#define CH_NINE_3    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_NINE_4    CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_FILLR_CHAR
-#define CH_FULL_NINE CH_NINE_0, '\n',\
-                     CH_NINE_1, '\n',\
-                     CH_NINE_2, '\n',\
-                     CH_NINE_3, '\n',\
-                     CH_NINE_4, '\n', '\0'
-const char nine[MIN_ARRAY_SIZE] =  { CH_FULL_NINE };
-
-// defines for space
-#define CH_SPACE_0   CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_SPACE_1   CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_SPACE_2   CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_SPACE_3   CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_SPACE_4   CFG_EMPTY_CHAR, CFG_EMPTY_CHAR, CFG_EMPTY_CHAR
-#define CH_FULL_SPACE   CH_SPACE_0, '\n', \
-                        CH_SPACE_1, '\n', \
-                        CH_SPACE_2, '\n', \
-                        CH_SPACE_3, '\n', \
-                        CH_SPACE_4, '\n', '\0'
-const char space[MIN_ARRAY_SIZE] = {CH_FULL_SPACE};
-
-static const char* decodeChar(const char c);
-static const char* numeric(const char c);
-static char* alphabetic(char c);
-static char* generate_space(void);
-
-const char* CHR_getCharacter(const char c)
+int CHR_get_string(const char *str, const int str_len, const encoding_t* enc, char *buffer, const int buffer_size)
 {
-    return decodeChar(c);
-}
+    // validate input pointers
+    if (str == NULL || enc == NULL || buffer == NULL)
+        return 0;
+    // ensure the buffer is big enough to hold the string
 
-int CHR_getPartialCharacter(const char c, const int row, char* out, const int len, int offset)
-{
-    // make sure there's space to get the character
-    if (len < CFG_CHAR_WIDTH + 1)
-        return -1;
-
-    const char* pStr = decodeChar(c);
-    int newline = 1;
-
-    int maxCopy = len < CFG_CHAR_WIDTH + newline? len : CFG_CHAR_WIDTH;
-
-    // Adjust row calculation because full characters contain \n at th end of each row.
-    strncpy(out+offset, &pStr[row * (CFG_CHAR_WIDTH + newline)], maxCopy);
-    offset += CFG_CHAR_WIDTH;
-    out[offset] = CFG_EMPTY_CHAR;
-    offset += 1;
-
-    return offset;
-}
-
-static const char* decodeChar(const char c)
-{
-    const char* pStr;
-    if(c == ' ')
-        pStr = space;
-    else if(isdigit(c))
-        pStr = numeric(c);
-    // if c is 0-9
-    //      numeric(c)
-    // else if c is A-Za-z
-    //      alphabetic(c)
-    // else space, \n, \r
-    // TODO handle math +-*/=()%
-    // TODO handle punctuation .?!,'"
-    return pStr;
-}
-
-static const char* numeric(const char c)
-{
-    const char* pStr;
-    switch(c)
+    int index = 0;
+    // create the string, row by row
+    for (int row = 0; row < enc->meta.height; ++row)
     {
-        case '0': pStr = zero; break;
-        case '1': pStr = one; break;
-        case '2': pStr = two; break;
-        case '3': pStr = three; break;
-        case '4': pStr = four; break;
-        case '5': pStr = five; break;
-        case '6': pStr = six; break;
-        case '7': pStr = seven; break;
-        case '8': pStr = eight; break;
-        case '9': pStr = nine; break;
-        default:
-            break;
+        // add each character in the row
+        for (int c = 0; str[c]; ++c)
+        {
+            // If the character is space and not the first character in the string,
+            // backtrack the buffer index since each normal character ends with
+            // an extra space appended. This ensures space is the correct width.
+            if (str[c] == ' ' && index > 0)
+                --index;
+            if (1 != CHR_get_partial_character(str[c], enc, row,  buffer, buffer_size, &index))
+            {
+                // error, complete string and return
+                buffer[index] = '\0';
+                return -1;
+            }
+            // if the character is not space, add padding between characters
+            if (str[c] != ' ')
+            {
+                buffer[index] = ' ';
+                ++index;
+            }
+        }
+        // complete the row
+        buffer[index-1] = '\n';
     }
-    return pStr;
+    // complete the string
+    buffer[index-1] = '\0';
+
+    return 1;
 }
 
-static char* generate_space(void)
+int CHR_get_character(const char ch, const encoding_t* enc, char *buffer, const int buffer_size)
 {
+    /* Required length is larger than charWidth*charHeight since we add a newline
+       to the end of each letter segment so it displays propperly and a +1 for \0.
+    */
+    //                                 newline                 null terminator
+    int required_len = ((enc->meta.width + 1) * enc->meta.height) + 1;
+    int ch_index = (int) toupper(ch);
 
+    // validate input pointers
+    if (enc == NULL || buffer == NULL)
+        return 0;
+    // check for valid character index in map
+    else if (ch_index < VALID_ASCII_RANGE_BEGIN || ch_index > VALID_ASCII_RANGE_END)
+        return 0;
+    // ensure the buffer is big enough to hold a character
+    else if (buffer_size < required_len)
+        return 0;
 
+    // Populate the buffer
+    int buf_index = 0;
+    for (int i = 0; buf_index < required_len && enc->char_map[ch_index][i] != '\0'; ++i, ++buf_index)
+    {
+        // add a newline at the end of each letter row segment
+        if (i != 0 && i % enc->meta.width == 0)
+        {
+            buffer[buf_index] = '\n';
+            ++buf_index;
+        }
+        buffer[buf_index] = enc->char_map[ch_index][i];
+    }
+    // Terminate string using buf_index because required_len is oversized
+    buffer[buf_index] = '\0';
+    return 1;
+}
+
+int CHR_get_partial_character(const char ch, const encoding_t* enc, const int char_row, char* buffer, const int buffer_size, int* buffer_index)
+{
+    int ch_index = (int) toupper(ch);
+
+    // validate input pointers
+    if (enc == NULL || buffer == NULL || buffer_index == NULL)
+        return 0;
+    // check for valid character index in map
+    else if (ch_index < VALID_ASCII_RANGE_BEGIN || ch_index > VALID_ASCII_RANGE_END)
+        return 0;
+    // invalid row
+    else if (char_row > enc->meta.height)
+        return 0;
+
+    // if there is room in the buffer and the character is defined, get the decoded row
+    if ((*buffer_index) + enc->meta.width < buffer_size && enc->char_map[ch_index] != NULL)
+    {
+        for (int i = 0; i < enc->meta.width; ++i)
+        {
+            buffer[*buffer_index] = enc->char_map[ch_index][char_row * (enc->meta.width) + i];
+            ++(*buffer_index);
+        }
+    }
+    else
+        return 0;
+
+    return 1;
+}
+
+int CHR_read_encoding_from_csv(const char *filename, const int length, encoding_t* encode)
+{
+    FILE *file = fopen(filename, "r");
+    if (file == NULL)
+    {
+        int size = 23 + strlen(filename);
+        char errorMsg[size];
+        int written = snprintf(errorMsg, size, "Failed to open file: '%s'", filename);
+        if (written >= 0 && written < size)
+        {
+            perror(errorMsg);
+        }
+        else
+            perror("Failed to create error message");
+        return 0;
+    }
+
+    char line[1024];
+
+    // read the width, height, foreground, and background character
+    if (fgets(line, sizeof(line), file))
+    {
+        char *token = strtok(line, ",");
+        if (token != NULL)
+            encode->meta.width = atoi(token);
+        token = strtok(NULL, ",");
+        if (token != NULL)
+            encode->meta.height = atoi(token);
+        token = strtok(NULL, ",");
+        if (token != NULL)
+            encode->meta.fill_char = *token;
+        token = strtok(NULL, ",");
+        if (token != NULL)
+            encode->meta.bg_char = *token;
+        token = strtok(NULL, ",");
+        while (token != NULL)
+            token = strtok(NULL, ",");
+    }
+
+    // Read each line in the CSV file
+    int line_number = 1; // starts at 1 since the 1st line (line_number zero) is metadata
+    while (fgets(line, sizeof(line), file))
+    {
+        ++line_number;
+        // Tokenize the line by comma
+        char *token = strtok(line, ",");
+        while (token != NULL)
+        {
+            // verify the token is within the valid ASCII range
+            if (*token < VALID_ASCII_RANGE_BEGIN || *token >= VALID_ASCII_RANGE_END)
+            {
+                fprintf(stderr, "Error line %d: character %c (UTF-8 0x%X) not recognized.\n", line_number, *token, (int)(*token)&0xFF);
+                break;
+            }
+            // special case for comma character since we use CSV
+            if (strncmp(token, "comma", 6) == 0)
+                *token = ',';
+            //if (isdigit(*token))
+            {
+                char *digit=token;
+                int end = encode->meta.width * encode->meta.height + 1;
+                char *encoding = (char*) malloc(end * sizeof(char));
+                if (encoding == NULL)
+                {
+                    perror("Failed to allocate character encoding");
+                    return 0;
+                }
+                for (int i = 0; i < end-1; ++i)
+                {
+                    token = strtok(NULL, ",");
+                    if (token != NULL)
+                    {
+                        //printf("%s ", token);
+                        // decode and store character
+                        encoding[i] = (*token == BACKGROUND_CHARACTER) ? encode->meta.bg_char : encode->meta.fill_char;
+                    }
+                }
+                encoding[end]='\0';
+                encode->char_map[(int)*digit] = encoding;
+            }
+            token = strtok(NULL, ",");
+        }
+        //printf("\n");
+    }
+
+    fclose(file);
+    return 1;
+}
+
+void CHR_cleanup(const encoding_t* enc)
+{
+    for (int i = VALID_ASCII_RANGE_BEGIN; i < enc->char_map_size; ++i)
+    {
+        if (enc->char_map[i] != NULL)
+        {
+            // printf("freeing %d { %c :'%s'}\n", i, i, enc->char_map[i]); // DEBUG
+            free(enc->char_map[i]);
+        }
+        // else
+        //    printf("%d %c not defined\n", i, i); // DEBUG
+    }
 }
