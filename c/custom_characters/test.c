@@ -20,83 +20,37 @@
 #include <stdlib.h>
 #include <string.h>
 
-metadata_t fileinfo;
+#define BUF_SIZE 1024
 
-char* charmap[CHARMAP_SIZE];
-/*
-void read_csv(const char *filename)
+
+void printString(const char* str, const encoding_t* enc)
 {
-    return;
+    int slen = strlen(str);
+    char output[BUF_SIZE];
+
+    if (CHR_get_string(str, slen, enc, output, BUF_SIZE-1))
+        printf("%s\n\n", output);
+    else
+        printf("error printing: '%s'\n", str);
 }
 
-int bufferChar(char c, int startIndex, char *buf, int buf_size, int row)
+void print_encoding(const encoding_t* enc)
 {
-    char **table = charmap;
-    if (startIndex + fileinfo.width < buf_size && table[c] != NULL)
-    {
-        // if the character is space and not the first character in the string
-        // go back on index in the buffer since each normal character ends
-        // with an extra space appended
-        if (c == ' ' && startIndex > 0)
-            --startIndex;
-        int i;
-        for (i = 0; i < fileinfo.width; ++i)
-        {
-            buf[startIndex] = table[c][row * (fileinfo.width) + i];
-            ++startIndex;
-        }
-        // if the character is not space, add padding between characters
-        if (c != ' ')
-        {
-            buf[startIndex] = fileinfo.bg_char;
-            ++startIndex;
-        }
-    }
-    return startIndex;
-}*/
-/*
-void printString(char* str)
-{
-    int len = strlen(str);
-    
-    // create space to store the Nth row of all characters in the string plus space and \0
-    int linebufferSize = len * (fileinfo.width+1) + 1;
-    char linebuffer[linebufferSize];
-    int bufferIndex = 0;
-
-    //puts("");
-    for (int row = 0; row < fileinfo.height; ++row)
-    {
-        bufferIndex = 0;
-        // buffer each character's encoding
-        for (int c=0; str[c]; ++c)
-        {
-            bufferIndex = bufferChar(toupper(str[c]), bufferIndex, linebuffer, linebufferSize, row);
-        }
-        // send buffer to stdout
-        linebuffer[bufferIndex-1] = '\0';
-        printf("%s\n", linebuffer);
-    }
+    // for testing character rendering
+    printString("~`!@#$ %^&", enc);
+    printString("_()*/-+={}", enc);
+    printString("[],?.;:'\"", enc);
+    printString("0987654321", enc);
+    printString("abcdefghij", enc);
+    printString("klmnopqrst", enc);
+    printString("uvwxyz", enc);
+    puts("");
 }
-*/
-// void print_encoding(void)
-// {
-    
-//     #if 0 // for testing character rendering
-//     printString("~`!@#$%^&_");
-//     printString("()*/-+={}[]");
-//     printString(",?.;:'\"");
-//     printString("0987654321");
-//     printString("abcdefghij");
-//     printString("klmnopqrst");
-//     printString("uvwxyz");
-//     puts("");
-//     #endif
-// }
 
 int main(int argc, char *argv[])
 {
-    #define BUF_SIZE 1024
+    char* charmap[CHARMAP_SIZE];
+
     char enormousBuffer[BUF_SIZE * 8];
     char filename[BUF_SIZE];
     size_t enormousBufferRemainingSize = BUF_SIZE * 8;
@@ -169,6 +123,8 @@ int main(int argc, char *argv[])
             if (CHR_get_character('h', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
             puts("");
         }
+
+        //print_encoding(&enc); // DEBUG
     }
     CHR_cleanup(&enc);
     
