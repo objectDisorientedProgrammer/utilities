@@ -41,7 +41,20 @@ typedef struct encoding
    metadata_t meta;
 } encoding_t;
 
+/**
+ * Load an encoding from a CSV file. CALL THIS FIRST!
+ * @param[in] filename The file to read from.
+ * @param[in] length Filename length.
+ * @param[out] encode An encoding variable to populate.
+ *
+ * @return 1 if the encoding is loaded from the file, otherwise 0.
+ */
 int CHR_read_encoding_from_csv(const char *filename, const int length, encoding_t* encode);
+
+/**
+ * Release all resources used by an encoding. CALL THIS BEFORE PROGRAM EXIT!
+ * @param[in] enc The encoding to remove.
+ */
 void CHR_cleanup(const encoding_t* enc);
 
 /**
@@ -51,9 +64,9 @@ void CHR_cleanup(const encoding_t* enc);
  * @param[in] enc The character encoding.
  * @param[out] buffer The place to hold the decoded character.
  * @param[in] buffer_size The size of the buffer.
- * 
+ *
  * @note A null terminator is appended when using this function.
- * 
+ *
  * @return 1 if the entire string is converted, -1 if the string is partially converted, and 0 for other errors.
  */
 int CHR_get_string(const char *str, const int str_len, const encoding_t* enc, char *buffer, const int buffer_size);
@@ -64,7 +77,7 @@ int CHR_get_string(const char *str, const int str_len, const encoding_t* enc, ch
  * @param[in] enc The character encoding to use.
  * @param[out] buffer The place to hold the decoded character.
  * @param[in] buffer_size The size of the buffer.
- * 
+ *
  * @note A null terminator is appended when using this function.
  *
  * @return 1 if the character is populated into the buffer, otherwise 0.
@@ -79,7 +92,7 @@ int CHR_get_character(const char ch, const encoding_t* enc, char *buffer, const 
  * @param[out] buffer The place to hold the decoded character.
  * @param[in] buffer_size The size of the buffer.
  * @param[in/out] buffer_index The index to begin within the buffer and the new ending index.
- * 
+ *
  * @note No null terminator is appended when using this function.
  *
  * @return 1 if the character row is populated into the buffer, otherwise 0.
