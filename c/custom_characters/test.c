@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BUF_SIZE 1024
+#define BUF_SIZE 1024U
 
 
 void printString(const char* str, const encoding_t* enc)
@@ -47,17 +47,35 @@ void print_encoding(const encoding_t* enc)
     puts("");
 }
 
+void writeToFile(const char* filename, size_t filenameSize, const char* buffer, size_t bufferSize)
+{
+    FILE *file = fopen(filename, "w");
+
+    if (file == NULL)
+    {
+        fprintf(stderr, "Error opening output file: %s\n", filename);
+        return;
+    }
+
+    fprintf(file, "%s", buffer);
+
+    fclose(file);
+}
+
 int main(int argc, char *argv[])
 {
     char* charmap[CHARMAP_SIZE];
 
-    char enormousBuffer[BUF_SIZE * 8];
+    char enormousBuffer[BUF_SIZE * 8U];
     char filename[BUF_SIZE];
-    size_t enormousBufferRemainingSize = BUF_SIZE * 8;
+    size_t enormousBufferRemainingSize = BUF_SIZE * 8U;
 
     char input[BUF_SIZE];
     size_t inputRemainingSize = BUF_SIZE;
     int isDefault = 0;
+
+    char outputFile[BUF_SIZE];
+    strncpy(outputFile, "custom_string_default_output.txt", BUF_SIZE - 1);
     
     // process command line args
     if (argc > 1)
@@ -112,7 +130,10 @@ int main(int argc, char *argv[])
     if (1 == CHR_read_encoding_from_csv(filename, strlen(filename), &enc))
     {
         if (CHR_get_string(input, BUF_SIZE - inputRemainingSize, &enc, enormousBuffer, BUF_SIZE))
+        {
             printf("%s\n", enormousBuffer);
+            writeToFile(outputFile, BUF_SIZE, enormousBuffer, BUF_SIZE * 8U);
+        }
         else
             puts("error printing string");
         if (isDefault)
