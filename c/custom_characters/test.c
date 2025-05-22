@@ -20,8 +20,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BUF_SIZE 1024U
-
+#define BUF_SIZE (1024U)
+#define ENORMOUS_BUF_SIZE (BUF_SIZE * 8U)
 
 void printString(const char* str, const encoding_t* enc)
 {
@@ -66,9 +66,9 @@ int main(int argc, char *argv[])
 {
     char* charmap[CHARMAP_SIZE];
 
-    char enormousBuffer[BUF_SIZE * 8U];
+    char enormousBuffer[ENORMOUS_BUF_SIZE];
     char filename[BUF_SIZE];
-    size_t enormousBufferRemainingSize = BUF_SIZE * 8U;
+    size_t enormousBufferRemainingSize = ENORMOUS_BUF_SIZE;
 
     char input[BUF_SIZE];
     size_t inputRemainingSize = BUF_SIZE;
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
         if (CHR_get_string(input, BUF_SIZE - inputRemainingSize, &enc, enormousBuffer, BUF_SIZE))
         {
             printf("%s\n", enormousBuffer);
-            writeToFile(outputFile, BUF_SIZE, enormousBuffer, BUF_SIZE * 8U);
+            writeToFile(outputFile, BUF_SIZE, enormousBuffer, ENORMOUS_BUF_SIZE);
         }
         else
             puts("error printing string");
