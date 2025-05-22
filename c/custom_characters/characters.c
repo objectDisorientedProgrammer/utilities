@@ -48,7 +48,7 @@ int CHR_get_string(const char *str, const int str_len, const encoding_t* enc, ch
             // if the character is not space, add padding between characters
             if (str[c] != ' ')
             {
-                buffer[index] = ' ';
+                buffer[index] = enc->meta.bg_char;
                 ++index;
             }
         }
