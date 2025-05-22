@@ -20,8 +20,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BUF_SIZE 1024
-
+#define BUF_SIZE (1024U)
+#define ENORMOUS_BUF_SIZE (BUF_SIZE * 8U)
 
 void printString(const char* str, const encoding_t* enc)
 {
@@ -31,7 +31,7 @@ void printString(const char* str, const encoding_t* enc)
     if (CHR_get_string(str, slen, enc, output, BUF_SIZE-1))
         printf("%s\n\n", output);
     else
-        printf("error printing: '%s'\n", str);
+        fprintf(stderr, "Error creating string '%s'\n", str);
 }
 
 void print_encoding(const encoding_t* enc)
@@ -47,17 +47,35 @@ void print_encoding(const encoding_t* enc)
     puts("");
 }
 
+void writeToFile(const char* filename, size_t filenameSize, const char* buffer, size_t bufferSize)
+{
+    FILE *file = fopen(filename, "w");
+
+    if (file == NULL)
+    {
+        fprintf(stderr, "Error opening output file: %s\n", filename);
+        return;
+    }
+
+    fprintf(file, "%s", buffer);
+
+    fclose(file);
+}
+
 int main(int argc, char *argv[])
 {
     char* charmap[CHARMAP_SIZE];
 
-    char enormousBuffer[BUF_SIZE * 8];
-    char filename[BUF_SIZE];
-    size_t enormousBufferRemainingSize = BUF_SIZE * 8;
+    char enormousBuffer[ENORMOUS_BUF_SIZE] = {0};
+    char filename[BUF_SIZE] = {0};
+    size_t enormousBufferRemainingSize = ENORMOUS_BUF_SIZE;
 
-    char input[BUF_SIZE];
+    char input[BUF_SIZE] = {0};
     size_t inputRemainingSize = BUF_SIZE;
     int isDefault = 0;
+
+    char outputFile[BUF_SIZE] = {0};
+    strncpy(outputFile, "custom_string_default_output.txt", BUF_SIZE - 1);
     
     // process command line args
     if (argc > 1)
@@ -68,8 +86,7 @@ int main(int argc, char *argv[])
         if (argLen > BUF_SIZE-1)
         {
             filename[BUF_SIZE-1]='\0';
-            printf("%s -> %s\n", argv[a], filename);
-            perror("Filename too long");
+            fprintf(stderr, "Error: Filename too long %s -> %s\n", argv[a], filename);
             return -1;
         }
         ++a;
@@ -87,7 +104,7 @@ int main(int argc, char *argv[])
             }
             else
             {
-                printf("Error ran out of buffer space. Need %ld, have %ld.", argLen+2, inputRemainingSize);
+                fprintf(stderr, "Error: ran out of buffer space. Need %ld, have %ld.\n", argLen+2, inputRemainingSize);
                 break;
             }
         }
@@ -107,14 +124,17 @@ int main(int argc, char *argv[])
     enc.char_map_size = CHARMAP_SIZE;
 
     // initialize character map
-    memset(charmap, 0, CHARMAP_SIZE * sizeof(char));
+    memset(charmap, 0, CHARMAP_SIZE * sizeof(char*));
 
     if (1 == CHR_read_encoding_from_csv(filename, strlen(filename), &enc))
     {
         if (CHR_get_string(input, BUF_SIZE - inputRemainingSize, &enc, enormousBuffer, BUF_SIZE))
+        {
             printf("%s\n", enormousBuffer);
+            writeToFile(outputFile, BUF_SIZE, enormousBuffer, ENORMOUS_BUF_SIZE);
+        }
         else
-            puts("error printing string");
+            fprintf(stderr, "Error creating string '%s'\n", input);
         if (isDefault)
         {
             if (CHR_get_character('a', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
