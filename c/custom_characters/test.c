@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
                 break;
             }
         }
-        input[(BUF_SIZE * 8) - enormousBufferRemainingSize - 1] = '\0';
+        input[ENORMOUS_BUF_SIZE - enormousBufferRemainingSize - 1U] = '\0';
     }
     else
     {
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
 
     if (1 == CHR_read_encoding_from_csv(filename, strlen(filename), &enc))
     {
-        if (CHR_get_string(input, BUF_SIZE - inputRemainingSize, &enc, enormousBuffer, BUF_SIZE))
+        if (CHR_get_string(input, BUF_SIZE - inputRemainingSize, &enc, enormousBuffer, ENORMOUS_BUF_SIZE))
         {
             printf("%s\n", enormousBuffer);
             writeToFile(outputFile, BUF_SIZE, enormousBuffer, ENORMOUS_BUF_SIZE);
