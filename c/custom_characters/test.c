@@ -68,7 +68,6 @@ int main(int argc, char *argv[])
 
     char enormousBuffer[ENORMOUS_BUF_SIZE] = {0};
     char filename[BUF_SIZE] = {0};
-    size_t enormousBufferRemainingSize = ENORMOUS_BUF_SIZE;
 
     char input[BUF_SIZE] = {0};
     size_t inputRemainingSize = BUF_SIZE;
@@ -94,13 +93,15 @@ int main(int argc, char *argv[])
         while (argv[a])
         {
             argLen = strlen(argv[a]);
-            if (enormousBufferRemainingSize >= argLen + 2)
+            if (inputRemainingSize >= argLen + 2)
             {
+                // append the word
                 strncat(input, argv[a], inputRemainingSize);
                 inputRemainingSize -= argLen;
                 ++a;
+                // add a space after the word
                 strncat(input, " ", 2);
-                inputRemainingSize -= 2;
+                inputRemainingSize -= 1;
             }
             else
             {
@@ -108,7 +109,8 @@ int main(int argc, char *argv[])
                 break;
             }
         }
-        input[ENORMOUS_BUF_SIZE - enormousBufferRemainingSize - 1U] = '\0';
+        // -1 to remove the trailing space
+        input[BUF_SIZE - inputRemainingSize - 1U] = '\0';
     }
     else
     {
@@ -128,7 +130,7 @@ int main(int argc, char *argv[])
 
     if (1 == CHR_read_encoding_from_csv(filename, strlen(filename), &enc))
     {
-        if (CHR_get_string(input, BUF_SIZE - inputRemainingSize, &enc, enormousBuffer, ENORMOUS_BUF_SIZE))
+        if (CHR_get_string(input, strlen(input), &enc, enormousBuffer, ENORMOUS_BUF_SIZE))
         {
             printf("%s\n", enormousBuffer);
             writeToFile(outputFile, BUF_SIZE, enormousBuffer, ENORMOUS_BUF_SIZE);
