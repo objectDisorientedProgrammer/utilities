@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h> // getopt() on linux/mac
 
 #define BUF_SIZE (1024U)
 #define ENORMOUS_BUF_SIZE (BUF_SIZE * 8U)
@@ -44,6 +45,61 @@ void print_encoding(const encoding_t* enc)
     printString("abcdefghij", enc);
     printString("klmnopqrst", enc);
     printString("uvwxyz", enc);
+    puts("");
+}
+
+static void parse_arguments(int argc, char *argv[], char *ifile, char *ofile)
+{
+    int c = 0;
+    int errflg = 0;
+    // check for -f arg, -o arg, -h, -l, -v arguments
+    while ((c = getopt(argc, argv, ":f:o:hlv")) != -1)
+    {
+        switch(c)
+        {
+        case 'h':
+            puts("help message");
+            break;
+        case 'l':
+            puts("license message");
+            break;
+        case 'v':
+            puts("version message");
+            break;
+        case 'f':
+            ifile = optarg; // TODO issue #12
+            break;
+        case 'o':
+            ofile = optarg;
+            break;
+        case ':':       /* -f or -o without operand */
+            fprintf(stderr, "Option -%c requires an operand\n", optopt);
+            errflg++;
+            break;
+        case '?':
+        default:
+            fprintf(stderr, "Unrecognized option: '-%c'\n", optopt);
+            errflg++;
+        }
+    }
+    if (errflg)
+    {
+        fprintf(stderr, "usage: . . . ");
+        exit(2);
+    }
+    
+    if (ifile != NULL && strlen(ifile)) // TODO issue #12
+        printf("input file (-f): %s\n", ifile);
+    if (ofile != NULL && strlen(ofile))
+        printf("output file (-o): %s\n", ofile);
+    
+    // print other args for now.
+    printf("other args: ");
+    for ( ; optind < argc; optind++) {
+        if (access(argv[optind], R_OK)) {
+            printf("%s ", argv[optind]);
+        }
+    }
     puts("");
 }
 
@@ -77,6 +133,7 @@ int main(int argc, char *argv[])
     strncpy(outputFile, "custom_string_default_output.txt", BUF_SIZE - 1);
     
     // process command line args
+    parse_arguments(argc, argv, filename, outputFile);
     if (argc > 1)
     {
         int a = 1;
