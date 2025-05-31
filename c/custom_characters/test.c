@@ -78,8 +78,8 @@ static void printVersion(void)
 static void printHelpMessage(void)
 {
     printUsage();
-    char* optionIndent = "  ";
-    char* messageIndent = "    ";
+    const char* optionIndent = "  ";
+    const char* messageIndent = "    ";
     printf("%s-h%sDisplay this help message and exit.\n", optionIndent, messageIndent);
     printf("%s-l%sDisplay license and exit.\n", optionIndent, messageIndent);
     printf("%s-v%sDisplay program version and exit.\n", optionIndent, messageIndent);
