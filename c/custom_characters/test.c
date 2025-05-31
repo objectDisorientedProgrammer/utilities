@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h> // getopt() on linux/mac
 
 #define BUF_SIZE (1024U)
 #define ENORMOUS_BUF_SIZE (BUF_SIZE * 8U)
@@ -47,6 +48,117 @@ void print_encoding(const encoding_t* enc)
     puts("");
 }
 
+
+static void printUsage(void)
+{
+    puts("Usage: transcribe [-f encoding_file] [-o output_file] [-h] [-l] [-v] message to convert...");
+}
+
+static void printLicense(void)
+{
+    // ugly but it works
+    puts("   Copyright 2019 objectDisorientedProgrammer\n\n\
+   Licensed under the Apache License, Version 2.0 (the \"License\");\n\
+   you may not use this file except in compliance with the License.\n\
+   You may obtain a copy of the License at\n\n\
+       http://www.apache.org/licenses/LICENSE-2.0\n\n\
+   Unless required by applicable law or agreed to in writing, software\n\
+   distributed under the License is distributed on an \"AS IS\" BASIS,\n\
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n\
+   See the License for the specific language governing permissions and\n\
+   limitations under the License.");
+}
+
+static void printVersion(void)
+{
+    // TODO program name and version should be stored somewhere else
+    puts("Transcribe version 0.1.1");
+}
+
+static void printHelpMessage(void)
+{
+    printUsage();
+    const char* optionIndent = "  ";
+    const char* messageIndent = "    ";
+    printf("%s-h%sDisplay this help message and exit.\n", optionIndent, messageIndent);
+    printf("%s-l%sDisplay license and exit.\n", optionIndent, messageIndent);
+    printf("%s-v%sDisplay program version and exit.\n", optionIndent, messageIndent);
+}
+
+static void parseArguments(int argc, char *argv[], char *messageBuffer, size_t inputRemainingSize, char *ifile, char *ofile)
+{
+    int c = 0;
+    int errflg = 0;
+    // check for -f arg, -o arg, -h, -l, -v arguments
+    while ((c = getopt(argc, argv, ":f:o:hlv")) != -1)
+    {
+        switch(c)
+        {
+        case 'h':
+            printHelpMessage();
+            exit(0);
+            break;
+        case 'l':
+            printLicense();
+            exit(0);
+            break;
+        case 'v':
+            printVersion();
+            exit(0);
+            break;
+        // case 'f':
+        //     ifile = optarg; // TODO issue #12
+        //     break;
+        // case 'o':
+        //     ofile = optarg;
+        //     break;
+        case ':':       /* -f or -o without operand */
+            fprintf(stderr, "Option -%c requires an operand\n", optopt);
+            errflg++;
+            break;
+        case '?':
+        default:
+            fprintf(stderr, "Unrecognized option: '-%c'\n", optopt);
+            errflg++;
+        }
+    }
+    if (errflg)
+    {
+        printUsage();
+        exit(2);
+    }
+    
+    // TODO issue #12
+    // if (ifile != NULL && strlen(ifile))
+    //     printf("input file (-f): %s\n", ifile);
+    // if (ofile != NULL && strlen(ofile))
+    //     printf("output file (-o): %s\n", ofile);
+    
+    // print other args for now.
+    //printf("other args: ");
+    for ( ; optind < argc; optind++) {
+        if (access(argv[optind], R_OK))
+        {
+            size_t argLen = strlen(argv[optind]);
+            if (inputRemainingSize >= argLen + 2)
+            {
+                // append the word
+                strncat(messageBuffer, argv[optind], inputRemainingSize);
+                inputRemainingSize -= argLen;
+                // add a space after the word
+                strncat(messageBuffer, " ", 2);
+                inputRemainingSize -= 1;
+            }
+            else
+            {
+                fprintf(stderr, "Error: ran out of buffer space. Need %ld, have %ld.\n", argLen+2, inputRemainingSize);
+                break;
+            }
+        }
+    }
+    messageBuffer[BUF_SIZE - inputRemainingSize - 1U] = '\0';
+}
+
 void writeToFile(const char* filename, size_t filenameSize, const char* buffer, size_t bufferSize)
 {
     FILE *file = fopen(filename, "w");
@@ -60,6 +172,28 @@ void writeToFile(const char* filename, size_t filenameSize, const char* buffer, 
     fprintf(file, "%s", buffer);
 
     fclose(file);
+}
+
+void transcribeString(char** charmap, char* filename, char* input, char* enormousBuffer, const size_t bufferSize)
+{
+    encoding_t enc;
+    enc.char_map = charmap;
+    enc.char_map_size = CHARMAP_SIZE;
+
+    // initialize character map
+    memset(charmap, 0, CHARMAP_SIZE * sizeof(char*));
+
+    if (1 == CHR_read_encoding_from_csv(filename, strlen(filename), &enc))
+    {
+        if (CHR_get_string(input, strlen(input), &enc, enormousBuffer, bufferSize))
+        {
+            printf("%s\n", enormousBuffer);
+            //writeToFile(outputFile, BUF_SIZE, enormousBuffer, bufferSize);
+        }
+        else
+            fprintf(stderr, "Error creating string '%s'\n", input);
+    }
+    CHR_cleanup(&enc);
 }
 
 int main(int argc, char *argv[])
@@ -76,9 +210,11 @@ int main(int argc, char *argv[])
     char outputFile[BUF_SIZE] = {0};
     strncpy(outputFile, "custom_string_default_output.txt", BUF_SIZE - 1);
     
-    // process command line args
+    
     if (argc > 1)
     {
+        // process command line args
+        parseArguments(argc, argv, input, inputRemainingSize, filename, outputFile);
         int a = 1;
         size_t argLen = strlen(argv[a]);
         strncpy(filename, argv[a], BUF_SIZE - 1);
@@ -111,44 +247,21 @@ int main(int argc, char *argv[])
         }
         // -1 to remove the trailing space
         input[BUF_SIZE - inputRemainingSize - 1U] = '\0';
+
+        transcribeString(charmap, filename, input, enormousBuffer, ENORMOUS_BUF_SIZE);
     }
     else
-    {
-        // default values
-        strcpy(filename, "encoding_example.csv"); // default file
-        strcpy(input, "March 27, 2025"); // default string
-        inputRemainingSize = BUF_SIZE - 16;
-        isDefault = 1;
-    }
+        printUsage();
+    // else
+    // {
+    //     // default values
+    //     strcpy(filename, "encoding_example.csv"); // default file
+    //     strcpy(input, "March 27, 2025"); // default string
+    //     inputRemainingSize = BUF_SIZE - 16;
+    //     isDefault = 1;
+    // }
 
-    encoding_t enc;
-    enc.char_map = charmap;
-    enc.char_map_size = CHARMAP_SIZE;
-
-    // initialize character map
-    memset(charmap, 0, CHARMAP_SIZE * sizeof(char*));
-
-    if (1 == CHR_read_encoding_from_csv(filename, strlen(filename), &enc))
-    {
-        if (CHR_get_string(input, strlen(input), &enc, enormousBuffer, ENORMOUS_BUF_SIZE))
-        {
-            printf("%s\n", enormousBuffer);
-            writeToFile(outputFile, BUF_SIZE, enormousBuffer, ENORMOUS_BUF_SIZE);
-        }
-        else
-            fprintf(stderr, "Error creating string '%s'\n", input);
-        if (isDefault)
-        {
-            if (CHR_get_character('a', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
-            if (CHR_get_character('r', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
-            if (CHR_get_character('c', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
-            if (CHR_get_character('h', &enc, enormousBuffer, BUF_SIZE)) printf("\n%s\n", enormousBuffer);
-            puts("");
-        }
-
-        //print_encoding(&enc); // DEBUG
-    }
-    CHR_cleanup(&enc);
+    
     
     return 0;
 }
